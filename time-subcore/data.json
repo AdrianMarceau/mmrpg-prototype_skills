@@ -1,0 +1,10 @@
+{
+    "skill_token": "time-subcore",
+    "skill_name": "Time Subcore",
+    "skill_class": "skill",
+    "skill_description": "Allows native use of Time-type abilities",
+    "skill_description2": "Allows the robot to equip and use Time-type abilities as if they were a Time-core.",
+    "skill_flag_hidden": 0,
+    "skill_flag_complete": 0,
+    "skill_flag_published": 1
+}

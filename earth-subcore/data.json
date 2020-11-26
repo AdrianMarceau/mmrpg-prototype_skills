@@ -1,0 +1,10 @@
+{
+    "skill_token": "earth-subcore",
+    "skill_name": "Earth Subcore",
+    "skill_class": "skill",
+    "skill_description": "Allows native use of Earth-type abilities",
+    "skill_description2": "Allows the robot to equip and use Earth-type abilities as if they were an Earth-core.",
+    "skill_flag_hidden": 0,
+    "skill_flag_complete": 0,
+    "skill_flag_published": 1
+}

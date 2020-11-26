@@ -1,0 +1,10 @@
+{
+    "skill_token": "crystal-subcore",
+    "skill_name": "Crystal Subcore",
+    "skill_class": "skill",
+    "skill_description": "Allows native use of Crystal-type abilities",
+    "skill_description2": "Allows the robot to equip and use Crystal-type abilities as if they were a Crystal-core.",
+    "skill_flag_hidden": 0,
+    "skill_flag_complete": 0,
+    "skill_flag_published": 1
+}

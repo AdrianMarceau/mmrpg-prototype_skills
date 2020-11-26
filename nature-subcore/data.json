@@ -1,0 +1,10 @@
+{
+    "skill_token": "nature-subcore",
+    "skill_name": "Nature Subcore",
+    "skill_class": "skill",
+    "skill_description": "Allows native use of Nature-type abilities",
+    "skill_description2": "Allows the robot to equip and use Nature-type abilities as if they were a Nature-core.",
+    "skill_flag_hidden": 0,
+    "skill_flag_complete": 0,
+    "skill_flag_published": 1
+}

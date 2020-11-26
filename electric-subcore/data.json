@@ -1,0 +1,10 @@
+{
+    "skill_token": "electric-subcore",
+    "skill_name": "Electric Subcore",
+    "skill_class": "skill",
+    "skill_description": "Allows native use of Electric-type abilities",
+    "skill_description2": "Allows the robot to equip and use Electric-type abilities as if they were an Electric-core.",
+    "skill_flag_hidden": 0,
+    "skill_flag_complete": 0,
+    "skill_flag_published": 1
+}

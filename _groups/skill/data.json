@@ -1,0 +1,35 @@
+{
+    "Elemental Subcores": {
+        "group_class": "skill",
+        "group_token": "Elemental Subcores",
+        "group_order": 0,
+        "group_child_tokens": [
+            "crystal-subcore",
+            "cutter-subcore",
+            "earth-subcore",
+            "electric-subcore",
+            "explode-subcore",
+            "flame-subcore",
+            "freeze-subcore",
+            "impact-subcore",
+            "laser-subcore",
+            "missile-subcore",
+            "nature-subcore",
+            "shadow-subcore",
+            "shield-subcore",
+            "space-subcore",
+            "swift-subcore",
+            "time-subcore",
+            "water-subcore",
+            "wind-subcore"
+        ]
+    },
+    "Misc Skills": {
+        "group_class": "skill",
+        "group_token": "Misc Skills",
+        "group_order": 1,
+        "group_child_tokens": [
+            "kind-hearted"
+        ]
+    }
+}

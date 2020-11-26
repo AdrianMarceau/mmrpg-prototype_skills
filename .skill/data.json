@@ -1,0 +1,10 @@
+{
+    "skill_token": "skill",
+    "skill_name": "Skill",
+    "skill_class": "system",
+    "skill_description": "",
+    "skill_description2": "",
+    "skill_flag_hidden": 1,
+    "skill_flag_complete": 0,
+    "skill_flag_published": 0
+}

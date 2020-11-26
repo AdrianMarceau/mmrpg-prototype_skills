@@ -1,0 +1,10 @@
+{
+    "skill_token": "shield-subcore",
+    "skill_name": "Shield Subcore",
+    "skill_class": "skill",
+    "skill_description": "Allows native use of Shield-type abilities",
+    "skill_description2": "Allows the robot to equip and use Shield-type abilities as if they were a Shield-core.",
+    "skill_flag_hidden": 0,
+    "skill_flag_complete": 0,
+    "skill_flag_published": 1
+}

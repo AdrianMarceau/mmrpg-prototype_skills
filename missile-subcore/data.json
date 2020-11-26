@@ -1,0 +1,10 @@
+{
+    "skill_token": "missile-subcore",
+    "skill_name": "Missile Subcore",
+    "skill_class": "skill",
+    "skill_description": "Allows native use of Missile-type abilities",
+    "skill_description2": "Allows the robot to equip and use Missile-type abilities as if they were a Missile-core.",
+    "skill_flag_hidden": 0,
+    "skill_flag_complete": 0,
+    "skill_flag_published": 1
+}

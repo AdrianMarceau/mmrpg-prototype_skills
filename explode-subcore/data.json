@@ -1,0 +1,10 @@
+{
+    "skill_token": "explode-subcore",
+    "skill_name": "Explode Subcore",
+    "skill_class": "skill",
+    "skill_description": "Allows native use of Explode-type abilities",
+    "skill_description2": "Allows the robot to equip and use Explode-type abilities as if they were an Explode-core.",
+    "skill_flag_hidden": 0,
+    "skill_flag_complete": 0,
+    "skill_flag_published": 1
+}
