@@ -1,0 +1,10 @@
+{
+    "skill_token": "charge-submodule",
+    "skill_name": "Charge Submodule",
+    "skill_class": "skill",
+    "skill_description": "Improves the robot's charging capabilities",
+    "skill_description2": "Improves the robot's charging capabilities allowing them to skip the charging phase of some abilities.",
+    "skill_flag_hidden": 0,
+    "skill_flag_complete": 1,
+    "skill_flag_published": 1
+}
