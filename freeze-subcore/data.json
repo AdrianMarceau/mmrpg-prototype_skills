@@ -5,6 +5,6 @@
     "skill_description": "Allows native use of Freeze-type abilities",
     "skill_description2": "Allows the robot to equip and use Freeze-type abilities as if they were a Freeze-core.",
     "skill_flag_hidden": 0,
-    "skill_flag_complete": 0,
+    "skill_flag_complete": 1,
     "skill_flag_published": 1
 }
