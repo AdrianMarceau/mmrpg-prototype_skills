@@ -1,0 +1,10 @@
+{
+    "skill_token": "xtreme-submodule",
+    "skill_name": "Xtreme Submodule",
+    "skill_class": "skill",
+    "skill_description": "Intensifies all stat changes on the robot",
+    "skill_description2": "Deregulates the robot's stats in battle making any stat changes to it have an extreme effect.",
+    "skill_flag_hidden": 0,
+    "skill_flag_complete": 1,
+    "skill_flag_published": 1
+}
