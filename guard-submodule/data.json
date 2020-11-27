@@ -1,0 +1,10 @@
+{
+    "skill_token": "guard-submodule",
+    "skill_name": "Guard Submodule",
+    "skill_class": "skill",
+    "skill_description": "Protects the robot from all stat changes",
+    "skill_description2": "Protects the robot's stats in battle making any attempts at changing them have no effect.",
+    "skill_flag_hidden": 0,
+    "skill_flag_complete": 1,
+    "skill_flag_published": 1
+}
