@@ -1,0 +1,10 @@
+{
+    "skill_token": "target-submodule",
+    "skill_name": "Target Submodule",
+    "skill_class": "skill",
+    "skill_description": "Improves the robot's targeting capabilities",
+    "skill_description2": "Improves the robot's targeting capabilities allowing them to reach even benched robots with most abilities.",
+    "skill_flag_hidden": 0,
+    "skill_flag_complete": 1,
+    "skill_flag_published": 1
+}
