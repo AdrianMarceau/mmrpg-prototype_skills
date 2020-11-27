@@ -24,10 +24,22 @@
             "wind-subcore"
         ]
     },
-    "Misc Skills": {
+    "Internal Submodules": {
         "group_class": "skill",
-        "group_token": "Misc Skills",
+        "group_token": "Internal Submodules",
         "group_order": 1,
+        "group_child_tokens": [
+            "target-submodule",
+            "charge-submodule",
+            "guard-submodule",
+            "reverse-submodule",
+            "xtreme-submodule"
+        ]
+    },
+    "Hero Skills": {
+        "group_class": "skill",
+        "group_token": "Hero Skills",
+        "group_order": 2,
         "group_child_tokens": [
             "kind-hearted"
         ]
