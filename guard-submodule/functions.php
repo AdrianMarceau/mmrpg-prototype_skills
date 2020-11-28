@@ -3,6 +3,11 @@ $functions = array(
     'skill_function' => function($objects){
         return true;
     },
+    'skill_function_onload' => function($objects){
+        extract($objects);
+        $this_skill->priority = -10;
+        return true;
+    },
     'rpg-ability_stat-boost_before' => function($objects){
         extract($objects);
         $options->return_early = true;
