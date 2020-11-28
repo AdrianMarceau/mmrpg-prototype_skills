@@ -15,6 +15,7 @@ $functions = array(
         $this_skill->target_options_update(array('frame' => 'defend', 'success' => array(9, 0, 0, 10, $options->extra_text)));
         $this_robot->trigger_target($this_robot, $this_skill, array('prevent_default_text' => true));
         $options->boost_amount = 0;
+        $options->extra_text = '';
         return false;
     },
     'rpg-ability_stat-break_before' => function($objects){
@@ -29,6 +30,7 @@ $functions = array(
         $this_skill->target_options_update(array('frame' => 'defend', 'success' => array(9, 0, 0, 10, $options->extra_text)));
         $this_robot->trigger_target($this_robot, $this_skill, array('prevent_default_text' => true));
         $options->break_amount = 0;
+        $options->extra_text = '';
         return false;
     }
 );
