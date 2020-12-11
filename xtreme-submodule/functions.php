@@ -10,6 +10,7 @@ $functions = array(
     },
     'rpg-ability_stat-boost_before' => function($objects){
         extract($objects);
+        if ($this_robot !== $recipient_robot){ return; }
         if (!$options->is_fixed_amount){
             $trigger_text = $this_robot->print_name().'\'s '.$this_skill->print_name().' overclocks stat changes! ';
             if (!empty($options->extra_text)){ $options->extra_text .= ' <br /> '; }
@@ -22,6 +23,7 @@ $functions = array(
     },
     'rpg-ability_stat-break_before' => function($objects){
         extract($objects);
+        if ($this_robot !== $recipient_robot){ return; }
         if (!$options->is_fixed_amount){
             $trigger_text = $this_robot->print_name().'\'s '.$this_skill->print_name().' overclocks stat changes! ';
             if (!empty($options->extra_text)){ $options->extra_text .= ' <br /> '; }
