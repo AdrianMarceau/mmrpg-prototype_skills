@@ -5,6 +5,7 @@ $functions = array(
     },
     'rpg-ability_stat-boost_before' => function($objects){
         extract($objects);
+        if ($this_robot !== $recipient_robot){ return; }
         if (!$options->is_fixed_amount){
             $options->return_early = true;
             $options->boost_amount *= -1;
@@ -24,6 +25,7 @@ $functions = array(
     },
     'rpg-ability_stat-break_before' => function($objects){
         extract($objects);
+        if ($this_robot !== $recipient_robot){ return; }
         if (!$options->is_fixed_amount){
             $options->return_early = true;
             $options->break_amount *= -1;

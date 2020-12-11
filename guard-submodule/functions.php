@@ -10,6 +10,7 @@ $functions = array(
     },
     'rpg-ability_stat-boost_before' => function($objects){
         extract($objects);
+        if ($this_robot !== $recipient_robot){ return; }
         $options->return_early = true;
         if (empty($options->boost_amount)){ return false; }
         if (!empty($this_skill->skill_results['flag_'.$this_skill->skill_token.'_triggered'])){ return false; }
@@ -25,6 +26,7 @@ $functions = array(
     },
     'rpg-ability_stat-break_before' => function($objects){
         extract($objects);
+        if ($this_robot !== $recipient_robot){ return; }
         $options->return_early = true;
         if (empty($options->break_amount)){ return false; }
         if (!empty($this_skill->skill_results['flag_'.$this_skill->skill_token.'_triggered'])){ return false; }
