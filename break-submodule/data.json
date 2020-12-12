@@ -3,7 +3,7 @@
     "skill_name": "Break Submodule",
     "skill_class": "skill",
     "skill_description": "Increases the robot's stat break powers",
-    "skill_description2": "Increases the effectiveness of stat breaks inflicted by this robot's abilities to twice their usual power.",
+    "skill_description2": "Increases the effectiveness of stat breaks inflicted by the robot's abilities to twice their usual power.",
     "skill_flag_hidden": 0,
     "skill_flag_complete": 1,
     "skill_flag_published": 1
