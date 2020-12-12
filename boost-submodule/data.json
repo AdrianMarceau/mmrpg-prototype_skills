@@ -3,7 +3,7 @@
     "skill_name": "Boost Submodule",
     "skill_class": "skill",
     "skill_description": "Increases the robot's stat boost powers",
-    "skill_description2": "Increases the effectiveness of stat boosts granted by this robot's abilities to twice their usual power.",
+    "skill_description2": "Increases the effectiveness of stat boosts granted by the robot's abilities to twice their usual power.",
     "skill_flag_hidden": 0,
     "skill_flag_complete": 1,
     "skill_flag_published": 1
