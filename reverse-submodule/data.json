@@ -3,7 +3,7 @@
     "skill_name": "Reverse Submodule",
     "skill_class": "skill",
     "skill_description": "Reverses all stat changes on the robot",
-    "skill_description2": "Regulates the robot's stats in battle and makes any stat changes to it have an opposite effect.",
+    "skill_description2": "Regulates the robot's stats in battle and makes any stat changes inflicted on them have an opposite effect.",
     "skill_flag_hidden": 0,
     "skill_flag_complete": 1,
     "skill_flag_published": 1
