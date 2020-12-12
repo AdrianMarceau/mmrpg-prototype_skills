@@ -3,7 +3,7 @@
     "skill_name": "Weapon Subsaver",
     "skill_class": "skill",
     "skill_description": "Reduces weapon energy used by abilities",
-    "skill_description2": "Reduces the weapon energy consumed by this robot when using elemental abilities by up to half.",
+    "skill_description2": "Reduces the weapon energy consumed by the robot when using elemental abilities by up to half.",
     "skill_flag_hidden": 0,
     "skill_flag_complete": 1,
     "skill_flag_published": 1
