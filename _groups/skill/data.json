@@ -33,15 +33,17 @@
             "charge-submodule",
             "guard-submodule",
             "reverse-submodule",
-            "xtreme-submodule"
+            "xtreme-submodule",
+            "boost-submodule",
+            "break-submodule"
         ]
     },
-    "Hero Skills": {
+    "Misc Skills": {
         "group_class": "skill",
-        "group_token": "Hero Skills",
+        "group_token": "Misc Skills",
         "group_order": 2,
         "group_child_tokens": [
-            "kind-hearted"
+            "weapon-subsaver"
         ]
     }
 }
