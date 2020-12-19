@@ -50,17 +50,10 @@ $functions = array(
         }
 
         // If a condition was provided, make sure we quality for this boost
-        if (!empty($this_skill->skill_parameters['condition'])){
-            $boost_condition = $this_skill->values['skill_parameter_condition'];
-            list($c_stat, $c_operator, $c_value) = array_values($boost_condition);
-            $is_percent_based = in_array($c_stat, array('energy', 'weapons')) ? true : false;
-            $boost_stat_value_required = intval($c_value);
-            $boost_stat_value_current = $this_robot->get_info('robot_'.$c_stat);
-            if ($is_percent_based){
-                $base_stat_value = $this_robot->get_info('robot_base_'.$c_stat);
-                $boost_stat_value_current = ($boost_stat_value_current / $base_stat_value) * 100;
-            }
-            if (!version_compare($boost_stat_value_current, $boost_stat_value_required, $c_operator)){
+        if (!empty($this_skill->skill_parameters['condition'])
+            && !empty($this_skill->values['skill_condition_parameters'])){
+            $condition_parameters = $this_skill->values['skill_condition_parameters'];
+            if (!$this_robot->check_battle_condition_is_true($condition_parameters)){
                 return false;
             }
         }
@@ -140,58 +133,14 @@ $functions = array(
 
         // Validate the optional "condition" parameter has been set to a valid value if it's there
         if (isset($this_skill->skill_parameters['condition'])){
-            // First check to ensure it matches the established condition format
-            // examples: "attack < 3" or "defense >= 2" or "energy < 50%"
             $condition = $this_skill->skill_parameters['condition'];
-            if (!preg_match('/^([a-z]+)\s?([\<\>\=\!]+)\s?(\-?[0-9]+\%?)$/i', $condition, $matches)){
-                error_log('skill parameter "condition" was set but was invalid ('.$this_skill->skill_token.':'.__LINE__.')');
-                error_log('$condition = '.print_r($condition, true));
-                $this_skill->set_flag('validated', false);
-                return false;
-            }
-            // Now check to make sure the individual parts of the condition are allowed
-            $allowed_condition_stats = array('energy', 'weapons', 'attack', 'defense', 'speed');
-            $allowed_condition_operators = array('=', '<=', '>=', '<', '>', '<>');
-            list($x, $c_stat, $c_operator, $c_value) = $matches;
-            if (!in_array($c_stat, $allowed_condition_stats)){
-                error_log('skill parameter "condition" stat was set but was invalid ('.$this_skill->skill_token.':'.__LINE__.')');
-                error_log('$c_stat = '.print_r($c_stat, true));
-                $this_skill->set_flag('validated', false);
-                return false;
-            } elseif (!in_array($c_operator, $allowed_condition_operators)){
-                error_log('skill parameter "condition" operator was set but was invalid ('.$this_skill->skill_token.':'.__LINE__.')');
-                error_log('$c_operator = '.print_r($c_operator, true));
-                $this_skill->set_flag('validated', false);
-                return false;
+            $condition_params = rpg_game::check_battle_condition_is_valid($condition, $this_skill);
+            if (!empty($condition_params)){
+                $this_skill->set_value('skill_condition_parameters', $condition_params);
             } else {
-                // Validate the value parameter differently for energy/weapons vs attack/defense/speed stats
-                if ($c_stat === 'energy' || $c_stat === 'weapons'){
-                    if (!strstr($c_value, '%')){
-                        error_log('skill parameter "condition" value must be percent for energy/weapons stat ('.$this_skill->skill_token.':'.__LINE__.')');
-                        error_log('$c_value = '.print_r($c_value, true));
-                        $this_skill->set_flag('validated', false);
-                        return false;
-                    } elseif (intval($c_value) <= 0 || intval($c_value) > 100){
-                        error_log('skill parameter "condition" value must be > 0% and <= 100% for energy/weapons stat ('.$this_skill->skill_token.':'.__LINE__.')');
-                        error_log('$c_value = '.print_r($c_value, true));
-                        $this_skill->set_flag('validated', false);
-                        return false;
-                    }
-                } else {
-                    if (intval($c_value) < MMRPG_SETTINGS_STATS_MOD_MIN || intval($c_value) > MMRPG_SETTINGS_STATS_MOD_MAX){
-                        error_log('skill parameter "condition" value must be > '.MMRPG_SETTINGS_STATS_MOD_MIN.' and < '.MMRPG_SETTINGS_STATS_MOD_MAX.' for attack/defense/speed stat ('.$this_skill->skill_token.':'.__LINE__.')');
-                        error_log('$c_value = '.print_r($c_value, true));
-                        $this_skill->set_flag('validated', false);
-                        return false;
-                    }
-                }
+                $this_skill->set_flag('validated', false);
+                return false;
             }
-            // If we made it this far it must be valid, so let's save our broken-up parameter better
-            $this_skill->set_value('skill_parameter_condition', array(
-                'stat' => $c_stat,
-                'operator' => $c_operator,
-                'value' => $c_value,
-                ));
         }
 
         // Everything is fine so let's return true
