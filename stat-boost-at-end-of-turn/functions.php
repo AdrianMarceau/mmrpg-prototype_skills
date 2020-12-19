@@ -30,7 +30,7 @@ $functions = array(
     'skill_function' => function($objects){
         return true;
     },
-    'rpg-robot_check-skills' => function($objects){
+    'rpg-robot_check-skills_end-of-turn' => function($objects){
 
         // Extract objects into the global scope
         extract($objects);
