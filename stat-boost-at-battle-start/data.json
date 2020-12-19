@@ -1,0 +1,14 @@
+{
+    "skill_token": "stat-boost-at-battle-start",
+    "skill_name": "Stat Boost at Battle-Start",
+    "skill_class": "skill",
+    "skill_description": "[dynamic] Boosts a stat at battle-start phase",
+    "skill_description2": "The robot's stat is automatically boosted at the start of battle, possibly when certain conditions are met.  Certain parameters must be set on the robot to use this skill (see the \"Functions\" tab for details) and the short\/long description must be customized.",
+    "skill_parameters": {
+        "stat": "none",
+        "amount": 0
+    },
+    "skill_flag_hidden": 0,
+    "skill_flag_complete": 1,
+    "skill_flag_published": 1
+}
