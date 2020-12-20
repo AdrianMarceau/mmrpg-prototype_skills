@@ -4,24 +4,24 @@
         "group_token": "Elemental Subcores",
         "group_order": 0,
         "group_child_tokens": [
-            "crystal-subcore",
             "cutter-subcore",
-            "earth-subcore",
-            "electric-subcore",
+            "impact-subcore",
+            "freeze-subcore",
             "explode-subcore",
             "flame-subcore",
-            "freeze-subcore",
-            "impact-subcore",
-            "laser-subcore",
-            "missile-subcore",
-            "nature-subcore",
-            "shadow-subcore",
-            "shield-subcore",
-            "space-subcore",
-            "swift-subcore",
+            "electric-subcore",
             "time-subcore",
+            "earth-subcore",
+            "wind-subcore",
             "water-subcore",
-            "wind-subcore"
+            "swift-subcore",
+            "nature-subcore",
+            "missile-subcore",
+            "crystal-subcore",
+            "shadow-subcore",
+            "space-subcore",
+            "shield-subcore",
+            "laser-subcore"
         ]
     },
     "Internal Submodules": {
@@ -29,21 +29,23 @@
         "group_token": "Internal Submodules",
         "group_order": 1,
         "group_child_tokens": [
+            "weapon-subsaver",
+            "boost-submodule",
+            "break-submodule",
             "target-submodule",
             "charge-submodule",
             "guard-submodule",
             "reverse-submodule",
-            "xtreme-submodule",
-            "boost-submodule",
-            "break-submodule"
+            "xtreme-submodule"
         ]
     },
-    "Misc Skills": {
+    "Dynamic Skills": {
         "group_class": "skill",
-        "group_token": "Misc Skills",
+        "group_token": "Dynamic Skills",
         "group_order": 2,
         "group_child_tokens": [
-            "weapon-subsaver"
+            "stat-boost-at-battle-start",
+            "stat-boost-at-end-of-turn"
         ]
     }
 }
