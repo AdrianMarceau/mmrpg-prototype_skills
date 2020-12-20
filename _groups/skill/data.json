@@ -29,14 +29,15 @@
         "group_token": "Internal Submodules",
         "group_order": 1,
         "group_child_tokens": [
-            "weapon-subsaver",
-            "boost-submodule",
-            "break-submodule",
             "target-submodule",
             "charge-submodule",
             "guard-submodule",
             "reverse-submodule",
-            "xtreme-submodule"
+            "xtreme-submodule",
+            "weapon-subsaver",
+            "boost-submodule",
+            "break-submodule",
+            "hyperscan-submodule"
         ]
     },
     "Dynamic Skills": {
