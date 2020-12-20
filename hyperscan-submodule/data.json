@@ -1,0 +1,11 @@
+{
+    "skill_token": "hyperscan-submodule",
+    "skill_name": "Hyperscan Submodule",
+    "skill_class": "skill",
+    "skill_description": "Reveals the target's abilities when scanning",
+    "skill_description2": "Improves the robot's scanning capabilities allowing them to see even the target's abilities when scanning.",
+    "skill_parameters": [],
+    "skill_flag_hidden": 0,
+    "skill_flag_complete": 1,
+    "skill_flag_published": 1
+}
