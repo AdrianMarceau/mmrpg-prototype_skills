@@ -9,7 +9,11 @@ $functions = array(
         extract($objects);
 
         // Turn ON the ability to see skills/abilities during the scan
-        $this_player->set_flag('hyperscan_enabled', true);
+        // by adding this robot's ID to the player's hyperscan list
+        $hyperscan_robots = $this_player->get_value('hyperscan_robots');
+        if (empty($hyperscan_robots)){ $hyperscan_robots = array(); }
+        if (!in_array($this_robot->robot_id, $hyperscan_robots)){ $hyperscan_robots[] = $this_robot->robot_id; }
+        $this_player->set_value('hyperscan_robots', $hyperscan_robots);
 
         // Only bother printing this message if the player is a human
         if ($this_player->player_autopilot === false){
