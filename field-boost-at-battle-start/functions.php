@@ -98,6 +98,7 @@ $functions = array(
             }
 
             // Remove this item attachment from this robot
+            $this_robot->set_frame('base');
             $this_robot->unset_attachment($this_attachment_token);
 
             // If the "repeat" condition was set to FALSE, make sure we don't do this again
