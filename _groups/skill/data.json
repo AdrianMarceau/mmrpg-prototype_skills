@@ -45,7 +45,9 @@
         "group_order": 2,
         "group_child_tokens": [
             "stat-boost-at-battle-start",
-            "stat-boost-at-end-of-turn"
+            "stat-boost-at-end-of-turn",
+            "field-boost-at-battle-start",
+            "field-boost-at-end-of-turn"
         ]
     }
 }
