@@ -1,0 +1,13 @@
+{
+    "skill_token": "find-item-at-end-of-turn",
+    "skill_name": "Find Item at End-of-Turn",
+    "skill_class": "skill",
+    "skill_description": "[dynamic] Randomly finds items at end-of-turn phase",
+    "skill_description2": "The robot may randomly find an item at the end of the turn given provided parameters.  Found items are automatically added to the player's inventory.  Does not trigger in challenges, endless mode, or player battles.",
+    "skill_parameters": {
+        "all": true
+    },
+    "skill_flag_hidden": 0,
+    "skill_flag_complete": 1,
+    "skill_flag_published": 1
+}
