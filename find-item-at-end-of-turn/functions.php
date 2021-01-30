@@ -9,6 +9,7 @@ Required:
     - screws (boolean: true/false)
     - pellets (boolean: true/false)
     - capsules (boolean: true/false)
+    - tanks (boolean: true/false)
     - shards (boolean: true/false)
     - cores (boolean: true/false)
 
@@ -120,6 +121,15 @@ $functions = array(
             }
         }
 
+        // If TANKS are allowed to be found, add them to the drop table
+        if (in_array('all', $allowed_item_kinds)
+            || in_array('tanks', $allowed_item_kinds)){
+            if ($max_item_tier >= 2){
+                $item_drop_table['energy-tank'] = 3;
+                $item_drop_table['weapon-tank'] = 3;
+            }
+        }
+
         // If SHARDS are allowed to be found, add them to the drop table
         if (in_array('all', $allowed_item_kinds)
             || in_array('shards', $allowed_item_kinds)){
@@ -207,9 +217,12 @@ $functions = array(
         // Default to this skill being validated and go from there
         $this_skill->set_flag('validated', true);
 
+        // Now define an array of allowed items types (will be filtered later)
+        $allowed_item_kinds = array('screws', 'pellets', 'capsules', 'tanks', 'shards', 'cores');
+
         // We need to make sure at least one flag has been set, otherwise not validated
         $true_flags = array();
-        $allowed_flags = array('all', 'screws', 'pellets', 'capsules', 'shards', 'cores');
+        $allowed_flags = array_merge(array('all'), $allowed_item_kinds);
         foreach ($allowed_flags AS $flag_name){
             if (isset($this_skill->skill_parameters[$flag_name])
                 && !empty($this_skill->skill_parameters[$flag_name])){
@@ -220,22 +233,17 @@ $functions = array(
         // If none of the allowed flags were set, we have a problem
         if (empty($true_flags)){
             error_log('skill parameters were not set or were invalid ('.$this_skill->skill_token.':'.__LINE__.')');
-            if (isset($this_skill->skill_parameters['kind'])){
-                error_log('allowed = '.print_r($allowed_flags, true));
-            }
+            error_log('allowed = '.print_r($allowed_flags, true));
             $this_skill->set_flag('validated', false);
             return false;
         }
-
-        // Now define an array of allowed items types (will be filtered later)
-        $allowed_item_kinds = array('screws', 'pellets', 'capsules', 'shards', 'cores');
 
         // If the "all" parameter was set to true, allow all items, else filter given parameters
         $allow_all_kinds = isset($this_skill->skill_parameters['all']) && !empty($this_skill->skill_parameters['all']) ? true : false;
         if (!$allow_all_kinds){
             foreach ($allowed_item_kinds AS $key => $kind){
-                if (!isset($this_skill->skill_parameters[$flag_name])
-                    || empty($this_skill->skill_parameters[$flag_name])){
+                if (!isset($this_skill->skill_parameters[$kind])
+                    || empty($this_skill->skill_parameters[$kind])){
                     unset($allowed_item_kinds[$key]);
                     continue;
                 }
@@ -245,6 +253,7 @@ $functions = array(
 
         // Otherwise, define a variable with all the allowed drop types
         $this_skill->set_value('skill_allowed_item_kinds', $allowed_item_kinds);
+        //error_log('$allowed_item_kinds = '.print_r($allowed_item_kinds, true));
 
         // Everything is fine so let's return true
         return true;
