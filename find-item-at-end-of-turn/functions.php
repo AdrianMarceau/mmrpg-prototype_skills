@@ -40,17 +40,37 @@ $functions = array(
 
         //error_log('end-of-turn check for this skill');
 
+        // Use the robot's current level to determine which tier items they'll find
+        $max_item_tier = 1;
+        if ($this_robot->robot_level >= 33){ $max_item_tier += 1; }
+        if ($this_robot->robot_level >= 66){ $max_item_tier += 1; }
+        if ($this_robot->robot_level >= 99){ $max_item_tier += 1; }
+        //error_log('$max_item_tier = '.print_r($max_item_tier, true));
+
         // Define a boolean to check if skill will trigger
         $trigger_skill = false;
 
         // If the robot isn't lucky this turn, the skill doesn't work
-        $turn_int = intval(substr($this_battle->counters['battle_turn'], -1, 1));
-        $check_stats = array('energy', 'attack', 'defense', 'speed');
+        $battle_turn = $this_battle->counters['battle_turn'];
+        $lucky_number = $this_skill->values['skill_lucky_number'];
+        $lucky_int = intval(substr(($battle_turn + $lucky_number), -1, 1));
+        //error_log('$battle_turn = '.print_r($battle_turn, true));
+        //error_log('$lucky_number = '.print_r($lucky_number, true));
+        //error_log('$lucky_int ('.print_r(($battle_turn + $lucky_number), true).') = '.print_r($lucky_int, true));
+        $check_stats = array();
+        if ($this_robot->robot_level >= 0){ $check_stats[] = 'energy'; }
+        if ($this_robot->robot_level >= 20){ $check_stats[] = 'weapons'; }
+        if ($this_robot->robot_level >= 40){ $check_stats[] = 'attack'; }
+        if ($this_robot->robot_level >= 60){ $check_stats[] = 'defense'; }
+        if ($this_robot->robot_level >= 80){ $check_stats[] = 'speed'; }
+        if ($this_robot->robot_level >= 100){ $check_stats[] = 'level'; }
+        //$check_stats = array('energy', 'attack', 'defense', 'speed');
+        //error_log('$check_stats = '.print_r($check_stats, true));
         foreach ($check_stats AS $stat){
             $prop_name = 'robot_'.$stat;
             $stat_int = intval(substr($this_robot->$prop_name, -1, 1));
-            //error_log('$turn_int('.$turn_int.') vs $'.$stat.'_int('.$stat_int.')');
-            if ($turn_int === $stat_int){ $trigger_skill = true; break; }
+            //error_log('$'.$stat.'_int('.$stat_int.') vs $lucky_int('.$lucky_int.')');
+            if ($stat_int === $lucky_int){ $trigger_skill = true; break; }
         }
 
         // If we're not allowed to trigger the skill now, return false
@@ -75,12 +95,6 @@ $functions = array(
             }
         }
         //error_log('$allowed_type_weights = '.print_r($allowed_type_weights, true));
-
-        // Use the robot's current level to determine which tier items they'll find
-        $max_item_tier = 1;
-        if ($this_robot->robot_level >= 33){ $max_item_tier += 1; }
-        if ($this_robot->robot_level >= 66){ $max_item_tier += 1; }
-        if ($this_robot->robot_level >= 99){ $max_item_tier += 1; }
 
         // If SCREWS are allowed to be found, add them to the drop table
         if (in_array('all', $allowed_item_kinds)
@@ -214,8 +228,16 @@ $functions = array(
         // Extract objects into the global scope
         extract($objects);
 
+        // If this skill has already been validated, don't do the work again
+        if (isset($this_skill->flags['validated'])){ return; }
+
         // Default to this skill being validated and go from there
         $this_skill->set_flag('validated', true);
+
+        // First we should also define a "lucky number" for this battle we'll later
+        $this_lucky_number = mt_rand(0, 9);
+        $this_skill->set_value('skill_lucky_number', $this_lucky_number);
+        //error_log('$this_lucky_number = '.print_r($this_lucky_number, true));
 
         // Now define an array of allowed items types (will be filtered later)
         $allowed_item_kinds = array('screws', 'pellets', 'capsules', 'tanks', 'shards', 'cores');
