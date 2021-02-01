@@ -47,6 +47,16 @@ $functions = array(
         if ($this_robot->robot_level >= 99){ $max_item_tier += 1; }
         //error_log('$max_item_tier = '.print_r($max_item_tier, true));
 
+        // Use the robot's current level (and/or held item) to determine how many chances they get
+        $max_trigger_chances = 1;
+        if ($this_robot->robot_level >= 20){ $max_trigger_chances += 1; }
+        if ($this_robot->robot_level >= 40){ $max_trigger_chances += 1; }
+        if ($this_robot->robot_level >= 60){ $max_trigger_chances += 1; }
+        if ($this_robot->robot_level >= 80){ $max_trigger_chances += 1; }
+        if ($this_robot->robot_level >= 100){ $max_trigger_chances += 1; }
+        if ($this_robot->robot_item == 'fortune-module'){ $max_trigger_chances += 1; }
+        //error_log('$max_trigger_chances = '.print_r($max_trigger_chances, true));
+
         // Define a boolean to check if skill will trigger
         $trigger_skill = false;
 
@@ -57,14 +67,9 @@ $functions = array(
         //error_log('$battle_turn = '.print_r($battle_turn, true));
         //error_log('$lucky_number = '.print_r($lucky_number, true));
         //error_log('$lucky_int ('.print_r(($battle_turn + $lucky_number), true).') = '.print_r($lucky_int, true));
-        $check_stats = array();
-        if ($this_robot->robot_level >= 0){ $check_stats[] = 'energy'; }
-        if ($this_robot->robot_level >= 20){ $check_stats[] = 'weapons'; }
-        if ($this_robot->robot_level >= 40){ $check_stats[] = 'attack'; }
-        if ($this_robot->robot_level >= 60){ $check_stats[] = 'defense'; }
-        if ($this_robot->robot_level >= 80){ $check_stats[] = 'speed'; }
-        if ($this_robot->robot_level >= 100){ $check_stats[] = 'level'; }
-        //$check_stats = array('energy', 'attack', 'defense', 'speed');
+        $trigger_stats = array('energy', 'weapons', 'attack', 'defense', 'speed', 'level');
+        $check_stats = array_slice($trigger_stats, 0, $max_trigger_chances);
+        //error_log('$trigger_stats = '.print_r($trigger_stats, true));
         //error_log('$check_stats = '.print_r($check_stats, true));
         foreach ($check_stats AS $stat){
             $prop_name = 'robot_'.$stat;
@@ -170,7 +175,15 @@ $functions = array(
         if (!empty($item_drop_table)){
             foreach ($item_drop_table AS $item_token => $item_weight){
                 $item_count = mmrpg_prototype_get_battle_item_count($item_token);
-                if ($item_count >= MMRPG_SETTINGS_ITEMS_MAXQUANTITY){
+                if (strstr($item_token, '-shard')){
+                    $shard_count = $item_count;
+                    $core_count = mmrpg_prototype_get_battle_item_count(str_replace('-shard', '-core', $item_token));
+                    if (($shard_count + 1) >= MMRPG_SETTINGS_SHARDS_MAXQUANTITY
+                        && $core_count >= MMRPG_SETTINGS_ITEMS_MAXQUANTITY){
+                        unset($item_drop_table[$item_token]);
+                        continue;
+                    }
+                } elseif ($item_count >= MMRPG_SETTINGS_ITEMS_MAXQUANTITY){
                     unset($item_drop_table[$item_token]);
                     continue;
                 }
