@@ -61,8 +61,16 @@ $functions = array(
         // Ensure the requested field multiplier isn't already at max value
         if (!isset($this_field->field_multipliers[$boost_type]) || $this_field->field_multipliers[$boost_type] < MMRPG_SETTINGS_MULTIPLIER_MAX){
 
+            // Collect the elemental type arrow index and sprite sheet
+            $this_type_token = !empty($boost_type) ? $boost_type : 'none';
+            $this_arrow_index = rpg_prototype::type_arrow_image('boost', $this_type_token);
+            $this_types_index = rpg_type::get_index();
+
+            // Collect the type colours so we can use them w/ effects
+            $temp_boost_colour_dark = 'rgb('.implode(', ', $this_types_index[$this_type_token]['type_colour_dark']).')';
+            $temp_boost_colour_light = 'rgb('.implode(', ', $this_types_index[$this_type_token]['type_colour_light']).')';
+
             // Define this skill's attachment token
-            $this_arrow_index = rpg_prototype::type_arrow_image('boost', !empty($boost_type) ? $boost_type : 'none');
             $this_attachment_token = 'skill_effects_field-booster';
             $this_attachment_info = array(
                 'class' => 'skill',
@@ -74,9 +82,25 @@ $functions = array(
                 'skill_frame_offset' => array('x' => 0, 'y' => 0, 'z' => -10)
                 );
 
+            // Define a separate attachment for the background to show a large colour overlay
+            $fx_attachment_token = 'skill_effects_field-booster_overlay';
+            $fx_attachment_info = array(
+                'class' => 'skill',
+                'attachment_token' => $fx_attachment_token,
+                'sticky' => true,
+                'skill_token' => $this_skill->skill_token,
+                'skill_image' => '_effects/arrow-overlay_boost-2',
+                'skill_frame' => 0,
+                'skill_frame_animate' => array(0),
+                'skill_frame_offset' => array('x' => -5, 'y' => 20, 'z' => -100),
+                'skill_frame_classes' => 'sprite_fullscreen ',
+                'skill_frame_styles' => 'opacity: 0.6; filter: alpha(opacity=60); background-color: '.$temp_boost_colour_dark.'; '
+                );
+
             // Attach this skill attachment to this robot temporarily
             $this_robot->set_frame('taunt');
             $this_robot->set_attachment($this_attachment_token, $this_attachment_info);
+            $this_robot->set_attachment($fx_attachment_token, $fx_attachment_info);
 
             // Create or increase the elemental booster for this field
             $temp_change_percent = $boost_amount;
@@ -93,13 +117,20 @@ $functions = array(
                 $this_battle->events_create($this_robot, false, $this_field->field_name.' Multipliers',
                     $this_robot->print_name().'\'s '.$this_skill->print_name().' skill kicked in!<br />'.
                     'The <span class="skill_stat type '.$boost_type.'">'.ucfirst($boost_type).'</span> field multiplier rose to <span class="skill_stat type none">'.$print_multiplier_value.'</span>!',
-                    array('canvas_show_this_skill_overlay' => false)
+                    array(
+                        'canvas_show_this_skill_overlay' => false,
+                        'event_flag_camera_action' => true,
+                        'event_flag_camera_side' => $this_robot->player->player_side,
+                        'event_flag_camera_focus' => $this_robot->robot_position,
+                        'event_flag_camera_depth' => $this_robot->robot_key
+                        )
                     );
             }
 
             // Remove this item attachment from this robot
             $this_robot->set_frame('base');
             $this_robot->unset_attachment($this_attachment_token);
+            $this_robot->unset_attachment($fx_attachment_token);
 
             // If the "repeat" condition was set to FALSE, make sure we don't do this again
             if ($boost_repeat === false){
