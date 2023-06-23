@@ -114,11 +114,13 @@ $functions = array(
             // Create the event to show this element boost
             if ($temp_change_percent > 0){
                 $print_multiplier_value = number_format($new_multiplier_value, 1);
-                $this_battle->events_create($this_robot, false, $this_field->field_name.' Multipliers',
+                $this_battle->events_create($this_robot, false, $this_robot->robot_name.'\'s '.$this_skill->skill_name,
                     $this_robot->print_name().'\'s '.$this_skill->print_name().' skill kicked in!<br />'.
                     'The <span class="skill_stat type '.$boost_type.'">'.ucfirst($boost_type).'</span> field multiplier rose to <span class="skill_stat type none">'.$print_multiplier_value.'</span>!',
                     array(
-                        'canvas_show_this_skill_overlay' => false,
+                        'this_skill' => $this_skill,
+                        'canvas_show_this_skill_overlay' => true,
+                        'canvas_show_this_skill_underlay' => false,
                         'event_flag_camera_action' => true,
                         'event_flag_camera_side' => $this_robot->player->player_side,
                         'event_flag_camera_focus' => $this_robot->robot_position,
