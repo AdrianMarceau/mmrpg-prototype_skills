@@ -205,10 +205,20 @@ $functions = array(
             if (!empty($item_token)){
 
                 // If this robot has a stat-based skill, display the trigger text separately
-                $trigger_text = $this_robot->print_name().'\'s '.$this_skill->print_name().' skill kicked in!<br /> ';
-                $trigger_text .= ucfirst($this_robot->get_pronoun('subject')).' started digging the ground below...';
-                $this_skill->target_options_update(array('frame' => 'defend', 'success' => array(9, 0, 0, -10, $trigger_text)));
-                $this_robot->trigger_target($this_robot, $this_skill, array('prevent_default_text' => true));
+                $this_robot->set_frame('defend');
+                $this_battle->events_create($this_robot, false, $this_robot->robot_name.'\'s '.$this_skill->skill_name,
+                    $this_robot->print_name().'\'s '.$this_skill->print_name().' skill kicked in!<br />'.
+                    ucfirst($this_robot->get_pronoun('subject')).' started digging the ground below...',
+                    array(
+                        'this_skill' => $this_skill,
+                        'canvas_show_this_skill_overlay' => false,
+                        'canvas_show_this_skill_underlay' => true,
+                        'event_flag_camera_action' => true,
+                        'event_flag_camera_side' => $this_robot->player->player_side,
+                        'event_flag_camera_focus' => $this_robot->robot_position,
+                        'event_flag_camera_depth' => $this_robot->robot_key
+                        )
+                    );
 
                 // If this robot has a stat-based skill, display the trigger text separately
                 $item_info = rpg_item::get_index_info($item_token);
