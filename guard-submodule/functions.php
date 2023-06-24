@@ -43,7 +43,7 @@ $functions = array(
         if (!empty($this_skill->skill_results['flag_'.$this_skill->skill_token.'_triggered'])){ return false; }
         else { $this_skill->skill_results['flag_'.$this_skill->skill_token.'_triggered'] = true; }
         if ($this_robot->has_item('reverse-module')){ $options->break_amount *= -1; }
-        $options->header_text = $this_robot->print_name().'\'s '.$this_skill->print_name();
+        $options->header_text = $this_robot->robot_name.'\'s '.$this_skill->skill_name;
         $options->extra_text = $this_robot->print_name().'\'s '.$this_skill->print_name().' protects against stat changes! ';
         $options->extra_text .= '<br /> '.$this_robot->print_name().'\'s '.$options->stat_type.' was not '.($options->break_amount > 0 ? 'lowered' : 'raised').'!';
         $this_robot->set_frame('defend');
