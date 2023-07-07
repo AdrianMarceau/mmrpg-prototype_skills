@@ -124,7 +124,10 @@ $functions = array(
                         'event_flag_camera_action' => true,
                         'event_flag_camera_side' => $this_robot->player->player_side,
                         'event_flag_camera_focus' => $this_robot->robot_position,
-                        'event_flag_camera_depth' => $this_robot->robot_key
+                        'event_flag_camera_depth' => $this_robot->robot_key,
+                        'event_flag_sound_effects' => array(
+                            array('name' => 'field-boost', 'volume' => 1.5)
+                            )
                         )
                     );
             }
