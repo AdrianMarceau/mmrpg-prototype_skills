@@ -220,23 +220,8 @@ $functions = array(
                         )
                     );
 
-                // If this robot has a stat-based skill, display the trigger text separately
-                $item_info = rpg_item::get_index_info($item_token);
-                $this_item = rpg_game::get_item($this_battle, $this_player, $this_robot, $item_info);
-                $old_item_count = mmrpg_prototype_get_battle_item_count($item_token);
-                $new_item_count = mmrpg_prototype_inc_battle_item_count($item_token, 1);
-                $a_or_an = preg_match('/^(a|e|i|o|u|y)/i', $item_token) ? 'an' : 'a';
-                $trigger_text = rpg_battle::random_positive_word().' '.$this_robot->print_name().' found '.$a_or_an.' '.$this_item->print_name().' underground!<br /> ';
-                $trigger_text .= 'The item was added to '.$this_player->print_name().'\'s inventory! ';
-                $trigger_text .= '<span class="item_stat item_type item_type_none">'.$old_item_count.' <sup style="bottom: 2px;">&raquo;</sup> '.$new_item_count.'</span>';
-                $item_x_frame = $this_robot->robot_position === 'active' ? 90 : 45;
-                $this_player->set_frame('victory');
-                $this_item->target_options_update(array('frame' => 'summon', 'success' => array(0, $item_x_frame, 10, 20, $trigger_text)));
-                $this_robot->trigger_target($this_robot, $this_item, array('prevent_default_text' => true));
-                $this_player->reset_frame();
-
-                // If the found item was an elemental shard, we need special code to add to inventory
-                if (strstr($item_token, '-shard')){ rpg_item::add_new_shard_to_inventory($item_token, $objects, array('robot_frame' => 'taunt')); }
+                // Trigger the actual item drop function on for the player
+                rpg_player::trigger_item_find($this_battle, $this_player, $this_robot, 0, $item_token, 1);
 
             }
 
