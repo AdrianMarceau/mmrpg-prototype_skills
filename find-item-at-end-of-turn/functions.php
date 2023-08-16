@@ -221,6 +221,7 @@ $functions = array(
                     );
 
                 // Trigger the actual item drop function on for the player
+                //error_log('rpg_player::trigger_item_find() w/ '.print_r($item_token, true));
                 rpg_player::trigger_item_find($this_battle, $this_player, $this_robot, 0, $item_token, 1);
 
             }
@@ -262,8 +263,8 @@ $functions = array(
 
         // If none of the allowed flags were set, we have a problem
         if (empty($true_flags)){
-            error_log('skill parameters were not set or were invalid ('.$this_skill->skill_token.':'.__LINE__.')');
-            error_log('allowed = '.print_r($allowed_flags, true));
+            //error_log('skill parameters were not set or were invalid ('.$this_skill->skill_token.':'.__LINE__.')');
+            //error_log('allowed = '.print_r($allowed_flags, true));
             $this_skill->set_flag('validated', false);
             return false;
         }
