@@ -19,6 +19,7 @@ $functions = array(
         if ($this_player->player_autopilot === false){
             // Print a message showing that this effect is taking place
             $this_robot->set_frame('taunt');
+            $this_battle->queue_sound_effect('scan-start');
             $this_battle->events_create($this_robot, false, $this_robot->robot_name.'\'s '.$this_skill->skill_name,
                 $this_robot->print_name().'\'s '.$this_skill->print_name().' skill kicked in!<br />'.
                 'Target robot abilities and skills can be scanned now!',
