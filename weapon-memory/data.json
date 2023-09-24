@@ -1,0 +1,11 @@
+{
+    "skill_token": "weapon-memory",
+    "skill_name": "Weapon Memory",
+    "skill_class": "skill",
+    "skill_description": "Adapts weaknesses to match upcoming abilities",
+    "skill_description2": "The robot adapts its weaknesses before using an ability to match those of the ability's original owner.",
+    "skill_parameters": [],
+    "skill_flag_hidden": 0,
+    "skill_flag_complete": 1,
+    "skill_flag_published": 1
+}
