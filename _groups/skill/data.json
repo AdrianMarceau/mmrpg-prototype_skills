@@ -37,7 +37,8 @@
             "weapon-subsaver",
             "boost-submodule",
             "break-submodule",
-            "hyperscan-submodule"
+            "hyperscan-submodule",
+            "weapon-memory"
         ]
     },
     "Dynamic Skills": {
@@ -48,7 +49,8 @@
             "stat-boost-at-battle-start",
             "stat-boost-at-end-of-turn",
             "field-boost-at-battle-start",
-            "field-boost-at-end-of-turn"
+            "field-boost-at-end-of-turn",
+            "find-item-at-end-of-turn"
         ]
     }
 }
