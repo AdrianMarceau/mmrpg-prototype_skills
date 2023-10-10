@@ -58,25 +58,31 @@ $functions = array(
             }
         }
 
-        // Ensure this robot's stat isn't already at max value
-        if ($this_robot->counters[$boost_stat.'_mods'] < MMRPG_SETTINGS_STATS_MOD_MAX){
-            // If this robot has a stat-based skill, display the trigger text separately
-            $trigger_text = $this_robot->print_name().'\'s '.$this_skill->print_name().' skill kicked in!';
-            if (!empty($this_robot->robot_item) && preg_match('/^(guard|reverse|xtreme)-module$/', $this_robot->robot_item)){
-                $this_skill->target_options_update(array('frame' => 'summon', 'success' => array(9, 0, 0, -10, $trigger_text)));
-                $this_robot->trigger_target($this_robot, $this_skill, array('prevent_default_text' => true));
-                $trigger_text = '';
+        // Collect the stat token(s) that are to be boosted, and then loop through them one by one
+        $boost_stats = $boost_stat === 'all' ? array('attack', 'defense', 'speed') : array($boost_stat);
+        foreach ($boost_stats AS $boost_key => $boost_stat){
+
+            // Ensure this robot's stat isn't already at max value
+            if ($this_robot->counters[$boost_stat.'_mods'] < MMRPG_SETTINGS_STATS_MOD_MAX){
+                // If this robot has a stat-based skill, display the trigger text separately
+                $trigger_text = $this_robot->print_name().'\'s '.$this_skill->print_name().' skill kicked in!';
+                if (!empty($this_robot->robot_item) && preg_match('/^(guard|reverse|xtreme)-module$/', $this_robot->robot_item)){
+                    $this_skill->target_options_update(array('frame' => 'summon', 'success' => array(9, 0, 0, -10, $trigger_text)));
+                    $this_robot->trigger_target($this_robot, $this_skill, array('prevent_default_text' => true));
+                    $trigger_text = '';
+                }
+                // Call the global stat boost function with customized options
+                rpg_ability::ability_function_stat_boost($this_robot, $boost_stat, $boost_amount, $this_skill, array(
+                    'success_frame' => 9,
+                    'failure_frame' => 9,
+                    'extra_text' => $trigger_text
+                    ));
+                // If the "repeat" condition was set to FALSE, make sure we don't do this again
+                if ($boost_repeat === false){
+                    $this_skill->set_flag('triggered', true);
+                }
             }
-            // Call the global stat boost function with customized options
-            rpg_ability::ability_function_stat_boost($this_robot, $boost_stat, $boost_amount, $this_skill, array(
-                'success_frame' => 9,
-                'failure_frame' => 9,
-                'extra_text' => $trigger_text
-                ));
-            // If the "repeat" condition was set to FALSE, make sure we don't do this again
-            if ($boost_repeat === false){
-                $this_skill->set_flag('triggered', true);
-            }
+
         }
 
         // Return true on success
@@ -92,7 +98,7 @@ $functions = array(
         $this_skill->set_flag('validated', true);
 
         // Validate the "stat" parameter has been set to a valid value
-        $allowed_stats = array('attack', 'defense', 'speed');
+        $allowed_stats = array('attack', 'defense', 'speed', 'all');
         if (!isset($this_skill->skill_parameters['stat'])
             || !in_array($this_skill->skill_parameters['stat'], $allowed_stats)){
             error_log('skill parameter "stat" was not set or was invalid ('.$this_skill->skill_token.':'.__LINE__.')');
