@@ -3,7 +3,7 @@
     "skill_name": "Copycat Submodule",
     "skill_class": "skill",
     "skill_description": "The robot copies the target's positive stat changes",
-    "skill_description2": "This robot automatically copies any positive stat changes on the opponent at the end of each turn.",
+    "skill_description2": "The robot automatically copies positive stat changes on the opponent at the end of each turn.",
     "skill_parameters": [],
     "skill_flag_hidden": 0,
     "skill_flag_complete": 1,
