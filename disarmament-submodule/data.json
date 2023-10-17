@@ -1,0 +1,11 @@
+{
+    "skill_token": "disarmament-submodule",
+    "skill_name": "Disarmament Submodule",
+    "skill_class": "skill",
+    "skill_description": "The robot disables hazardous explosives at the end of the turn",
+    "skill_description2": "The robot employs its expert knowledge of hazardous munitions to disarm any nearby explosives at the end of each turn.",
+    "skill_parameters": [],
+    "skill_flag_hidden": 0,
+    "skill_flag_complete": 1,
+    "skill_flag_published": 1
+}
