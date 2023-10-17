@@ -1,0 +1,13 @@
+{
+    "skill_token": "checkvalve-submodule",
+    "skill_name": "Checkvalve Submodule",
+    "skill_class": "skill",
+    "skill_description": "[dynamic] Protects the robot from stat reduction",
+    "skill_description2": "Protects the robot's favourite stat in battle making any attempts to reduce it have no effect.",
+    "skill_parameters": {
+        "stat": "all"
+    },
+    "skill_flag_hidden": 0,
+    "skill_flag_complete": 1,
+    "skill_flag_published": 1
+}
