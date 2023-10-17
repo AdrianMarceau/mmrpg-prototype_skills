@@ -68,7 +68,7 @@ $functions = array(
             $this_battle->queue_sound_effect('debuff-received');
             $this_battle->events_create($this_robot, false, $this_robot->robot_name.'\'s '.$this_skill->skill_name,
                 $this_robot->print_name().'\'s '.$this_skill->print_name().' skill kicked in!<br />'.
-                $this_robot->print_name().' removed explosive hazards from '.$this_robot->get_pronoun('possessive2').' side of the field!',
+                'Explosive hazards on '.$this_robot->get_pronoun('possessive2').' side of the field have been disarmed!',
                 array(
                     'this_skill' => $this_skill,
                     'canvas_show_this_skill_overlay' => false,
