@@ -1,0 +1,11 @@
+{
+    "skill_token": "metronome-submodule",
+    "skill_name": "Metronome Submodule",
+    "skill_class": "skill",
+    "skill_description": "Prevents the use of priority moves on the field",
+    "skill_description2": "The robot's adept timekeeping skills prevent priority moves from working while their still on the field.",
+    "skill_parameters": [],
+    "skill_flag_hidden": 0,
+    "skill_flag_complete": 1,
+    "skill_flag_published": 1
+}
