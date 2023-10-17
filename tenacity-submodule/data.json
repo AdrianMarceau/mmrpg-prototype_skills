@@ -1,0 +1,13 @@
+{
+    "skill_token": "tenacity-submodule",
+    "skill_name": "Tenacity Submodule",
+    "skill_class": "skill",
+    "skill_description": "[dynamic] The robot can inflict elemental damage without resistance",
+    "skill_description2": "The robot is able to inflict elemental damage on targets without regard to resistances or negative multipliers.  Required parameters must be set on the robot to use this skill (see the \"Functions\" tab for details) and the short\/long description must be customized.",
+    "skill_parameters": {
+        "type": "none"
+    },
+    "skill_flag_hidden": 0,
+    "skill_flag_complete": 1,
+    "skill_flag_published": 1
+}
