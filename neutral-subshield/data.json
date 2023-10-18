@@ -5,7 +5,7 @@
     "skill_description": "Protects the robot from Neutral type damage",
     "skill_description2": "The robot's armour completely protects it from Neutral type attack damage.",
     "skill_parameters": [],
-    "skill_flag_hidden": 1,
+    "skill_flag_hidden": 0,
     "skill_flag_complete": 1,
     "skill_flag_published": 1
 }
