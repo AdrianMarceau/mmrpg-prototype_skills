@@ -1,0 +1,15 @@
+{
+    "skill_token": "stat-boost-on-core-nearby",
+    "skill_name": "Stat Boost on Core Nearby",
+    "skill_class": "skill",
+    "skill_description": "[dynamic] The robot's stat is boosted when core type is nearby",
+    "skill_description2": "The robot's preferred stat is boosted by the presence of other robots on the field with a specific core type. Required parameters must be set on the robot to use this skill (see the \"Functions\" tab for details) and the short\/long description must be customized.",
+    "skill_parameters": {
+        "type": "none",
+        "stat": "none",
+        "amount": 0
+    },
+    "skill_flag_hidden": 0,
+    "skill_flag_complete": 1,
+    "skill_flag_published": 1
+}
