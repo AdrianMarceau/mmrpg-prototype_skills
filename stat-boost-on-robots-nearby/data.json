@@ -1,0 +1,17 @@
+{
+    "skill_token": "stat-boost-on-robots-nearby",
+    "skill_name": "Stat Boost on Robots Nearby",
+    "skill_class": "skill",
+    "skill_description": "[dynamic] The robot's stat is boosted when certain robots are nearby",
+    "skill_description2": "The robot's preferred stat is boosted by the presence of specific robots on the field. Required parameters must be set on the robot to use this skill (see the \"Functions\" tab for details) and the short\/long description must be customized.",
+    "skill_parameters": {
+        "robots": [
+            "none"
+        ],
+        "stat": "none",
+        "amount": 0
+    },
+    "skill_flag_hidden": 0,
+    "skill_flag_complete": 1,
+    "skill_flag_published": 1
+}
