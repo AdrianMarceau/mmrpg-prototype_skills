@@ -31,6 +31,7 @@ $functions = array(
         $boost_robots = $this_skill->skill_parameters['robots'];
         $boost_robots = !empty($boost_robots) ? explode(',', $boost_robots) : array();
         $boost_stat = $this_skill->skill_parameters['stat'];
+        $boost_stats = $boost_stat === 'all' ? array('attack', 'defense', 'speed') : array($boost_stat);
         $boost_amount = $this_skill->skill_parameters['amount'];
 
         // Check to see if there are any robots able to trigger this skill
@@ -62,12 +63,8 @@ $functions = array(
         $this_robot->set_frame('taunt');
         $this_battle->queue_sound_effect('scan-start');
         $this_battle->events_create($this_robot, false, $this_robot->robot_name.'\'s '.$this_skill->skill_name,
-            $this_robot->print_name().'\'s '.$this_skill->print_name().' skill kicked in!<br />'.
-            ucfirst($this_robot->get_pronoun('subject')).' took notice of '.$certain_text.' on the field...',
+            $this_robot->print_name().' took notice of '.$certain_text.' on the field...',
             array(
-                'this_skill' => $this_skill,
-                'canvas_show_this_skill_overlay' => false,
-                'canvas_show_this_skill_underlay' => true,
                 'event_flag_camera_action' => true,
                 'event_flag_camera_side' => $this_robot->player->player_side,
                 'event_flag_camera_focus' => $this_robot->robot_position,
@@ -82,9 +79,6 @@ $functions = array(
             $this_battle->queue_sound_effect('scan-start');
             $this_battle->events_create($this_robot, false, '', '',
                 array(
-                    'this_skill' => $this_skill,
-                    'canvas_show_this_skill_overlay' => false,
-                    'canvas_show_this_skill_underlay' => true,
                     'event_flag_camera_action' => true,
                     'event_flag_camera_side' => $player_and_robot['robot']->player->player_side,
                     'event_flag_camera_focus' => $player_and_robot['robot']->robot_position,
@@ -95,20 +89,22 @@ $functions = array(
         }
 
         // Ensure this robot's stat isn't already at max value
-        if ($this_robot->counters[$boost_stat.'_mods'] < MMRPG_SETTINGS_STATS_MOD_MAX){
-            // If this robot has a stat-based skill, display the trigger text separately
-            $trigger_text = $this_robot->print_name().' is getting pumped up!';
-            if (!empty($this_robot->robot_item) && preg_match('/^(guard|reverse|xtreme)-module$/', $this_robot->robot_item)){
-                $this_skill->target_options_update(array('frame' => 'summon', 'success' => array(9, 0, 0, -10, $trigger_text)));
-                $this_robot->trigger_target($this_robot, $this_skill, array('prevent_default_text' => true));
-                $trigger_text = '';
+        foreach ($boost_stats AS $boost_stat){
+            if ($this_robot->counters[$boost_stat.'_mods'] < MMRPG_SETTINGS_STATS_MOD_MAX){
+                // If this robot has a stat-based skill, display the trigger text separately
+                $trigger_text = $this_robot->print_name().' is getting pumped up!';
+                if (!empty($this_robot->robot_item) && preg_match('/^(guard|reverse|xtreme)-module$/', $this_robot->robot_item)){
+                    $this_skill->target_options_update(array('frame' => 'summon', 'success' => array(9, 0, 0, -10, $trigger_text)));
+                    $this_robot->trigger_target($this_robot, $this_skill, array('prevent_default_text' => true));
+                    $trigger_text = '';
+                }
+                // Call the global stat boost function with customized options
+                rpg_ability::ability_function_stat_boost($this_robot, $boost_stat, $boost_amount, $this_skill, array(
+                    'success_frame' => 9,
+                    'failure_frame' => 9,
+                    'extra_text' => $trigger_text
+                    ));
             }
-            // Call the global stat boost function with customized options
-            rpg_ability::ability_function_stat_boost($this_robot, $boost_stat, $boost_amount, $this_skill, array(
-                'success_frame' => 9,
-                'failure_frame' => 9,
-                'extra_text' => $trigger_text
-                ));
         }
 
         // Return true on success
@@ -133,7 +129,7 @@ $functions = array(
         }
 
         // Validate the "stat" parameter has been set to a valid value
-        $allowed_stats = array('attack', 'defense', 'speed');
+        $allowed_stats = array('attack', 'defense', 'speed', 'all');
         if (!isset($this_skill->skill_parameters['stat'])
             || !in_array($this_skill->skill_parameters['stat'], $allowed_stats)){
             error_log('skill parameter "stat" was not set or was invalid ('.$this_skill->skill_token.':'.__LINE__.')');
