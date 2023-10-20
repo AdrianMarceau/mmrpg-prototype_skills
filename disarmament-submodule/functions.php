@@ -33,14 +33,11 @@ $functions = array(
 
         // Collect a list of active robots from this player so we can loop through 'em
         $this_player_robots = $this_player->values['robots_active'];
-        //error_log('$this_player_robots = '.print_r($this_player_robots, true));
 
         // Loop through field attachments on this side of the battle first
         if (!empty($this_battle->battle_attachments)){
             foreach ($this_battle->battle_attachments AS $side_position => $battle_attachments){
                 if (!strstr($side_position, $this_player->player_side.'-')){ continue; }
-                //error_log('$battle_attachments = '.print_r($battle_attachments, true));
-                //error_log('$battle_attachments = '.print_r(array_keys($battle_attachments), true));
                 $attachment_token_regex = '/^ability_([-_a-z0-9]+)_([-a-z0-9]+)$/';
                 foreach ($battle_attachments AS $attachment_token => $attachment_info){
                     $attachment_token_clean = preg_replace($attachment_token_regex, '$1', $attachment_token);
@@ -56,17 +53,12 @@ $functions = array(
                         }
                     if (strstr($side_position, 'bench-')){ list($side, $position, $key) = explode('-', $attachment_token_context); }
                     else { list($side, $position) = explode('-', $attachment_token_context); $key = 0; }
-                    //error_log('$attachment_token_clean = '.print_r($attachment_token_clean, true));
-                    //error_log('$attachment_token_context = '.print_r($attachment_token_context, true));
-                    //error_log('looking for '.$side.' '.$position.' '.$key.' in $this_player_robots');
                     $robot = array_filter($this_player_robots, function($info) use ($side, $position, $key){
                         if ($info['robot_position'] !== $position){ return false; }
                         if ($position === 'bench' && $info['robot_key'] !== $key){ return false; }
                         return true;
                         });
                     if (!empty($robot)){ $robot = rpg_game::get_robot_by_id($robot[0]['robot_id']); }
-                    //error_log('$robot = '.print_r($robot, true));
-                    //error_log('$robot = '.print_r(($robot ? $robot->robot_string : 'false'), true));
                     $positions_of_interest[] = array(
                         'kind' => 'battle',
                         'key' => $side_position,
@@ -110,9 +102,6 @@ $functions = array(
                 unset($robot);
             }
         }
-
-        //error_log('$positions_of_interest = '.print_r(array_keys($positions_of_interest), true));
-        //error_log('$positions_of_interest = '.print_r($positions_of_interest, true));
 
         // If there aren't any points of interest, we should return now
         if (empty($positions_of_interest)){ return false; }
