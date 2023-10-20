@@ -19,10 +19,10 @@ $functions = array(
 
         // Define the list of explosive attachments/hazards that this skill removes
         $explosive_object_tokens = array(
-            'remote-mine_remote-mine',  // battle_attachments/side-position/ability_remote-mine_remote-mine_side-position
-            'galaxy-bomb_black-hole',  // battle_attachments/side-position/ability_galaxy-bomb_black-hole_side-position
-            'crash-bomber_crash-bomb',  // robot_attachments//ability_crash-bomber_crash-bomb
-            'chain-blast_chain-bomb',  // robot_attachments//ability_chain-blast_chain-bomb
+            'remote-mine_remote-mine',
+            'galaxy-bomb_black-hole',
+            'crash-bomber_crash-bomb',
+            'chain-blast_chain-bomb',
             );
         $object_fx_tokens = array(
             'chain-blast_chain-bomb' => 'chain-blast_fx'
