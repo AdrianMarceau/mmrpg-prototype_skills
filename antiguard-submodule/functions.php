@@ -9,25 +9,26 @@ $functions = array(
         return true;
 
     },
-    'rpg-robot_check-skills_end-of-turn' => function($objects){
+    'rpg-robot_check-skills_turn-start' => function($objects){
 
         // Extract all objects into the current scope
         extract($objects);
 
         // Define a flag to hold whether or not we removed anything
-        $explosive_objects_removed = 0;
+        $shield_objects_removed = 0;
 
-        // Define the list of explosive attachments/hazards that this skill removes
-        $explosive_object_tokens = array(
-            'super-arm_super-block',  // battle_attachments/side-position/ability_remote-mine_remote-mine_side-position
-            'core-shield_{type}',  // robot_attachments//ability_core-shield_{type}
+        // Define the list of shield attachments that this skill removes
+        $shield_object_tokens = array(
+            'core-shield_none',
+            // the rest will be added programatically
             );
         $object_fx_tokens = array(
+            // none for this ability
             );
 
         // Loop through the various elemental types and add core shields for each
         $types = rpg_type::get_index();
-        foreach ($types AS $token => $info){ $explosive_object_tokens[] = 'core-shield_'.$token; }
+        foreach ($types AS $token => $info){ $shield_object_tokens[] = 'core-shield_'.$token; }
 
         // Create an array to hold positions of special interest (hazards to remove)
         $positions_of_interest = array();
@@ -44,7 +45,7 @@ $functions = array(
                 foreach ($battle_attachments AS $attachment_token => $attachment_info){
                     $attachment_token_clean = preg_replace($attachment_token_regex, '$1', $attachment_token);
                     $attachment_token_context = preg_replace($attachment_token_regex, '$2', $attachment_token);
-                    if (!in_array($attachment_token_clean, $explosive_object_tokens)){ continue; }
+                    if (!in_array($attachment_token_clean, $shield_object_tokens)){ continue; }
                     $attachment_fx_token = false;
                     if (isset($object_fx_tokens[$attachment_token_clean])){
                         $attachment_fx_token = str_replace(
@@ -83,7 +84,7 @@ $functions = array(
                 if (!empty($robot->robot_attachments)){
                     foreach ($robot->robot_attachments AS $attachment_token => $attachment_info){
                         $attachment_token_clean = preg_replace('/^ability_([-_a-z0-9]+)$/', '$1', $attachment_token);
-                        if (!in_array($attachment_token_clean, $explosive_object_tokens)){ continue; }
+                        if (!in_array($attachment_token_clean, $shield_object_tokens)){ continue; }
                         $attachment_fx_token = false;
                         if (isset($object_fx_tokens[$attachment_token_clean])){
                             $attachment_fx_token = str_replace(
@@ -115,6 +116,9 @@ $functions = array(
         $this_battle->events_create($this_robot, false, $this_robot->robot_name.'\'s '.$this_skill->skill_name,
             $this_robot->print_name().' took notice of '.$certain_text.' on the field...',
             array(
+                'this_skill' => $this_skill,
+                'canvas_show_this_skill_overlay' => false,
+                'canvas_show_this_skill_underlay' => true,
                 'event_flag_camera_action' => true,
                 'event_flag_camera_side' => $this_robot->player->player_side,
                 'event_flag_camera_focus' => $this_robot->robot_position,
@@ -124,51 +128,54 @@ $functions = array(
         $this_robot->reset_frame();
 
         // Loop through and show the camera looking at them one-by-one
-        foreach ($positions_of_interest AS $key => $hazard_to_remove){
+        foreach ($positions_of_interest AS $key => $barrier_to_remove){
 
             // Show the camera looking at this robot first
-            $hazard_to_remove['robot']->set_frame('defend');
+            $this_robot->set_frame('summon');
+            $barrier_to_remove['robot']->set_frame('base');
             $this_battle->queue_sound_effect('scan-start');
             $this_battle->events_create($this_robot, false, '', '',
-                array(
-                    'event_flag_camera_action' => true,
-                    'event_flag_camera_side' => $hazard_to_remove['robot']->player->player_side,
-                    'event_flag_camera_focus' => $hazard_to_remove['robot']->robot_position,
-                    'event_flag_camera_depth' => $hazard_to_remove['robot']->robot_key
-                    )
-                );
-            $hazard_to_remove['robot']->reset_frame();
-
-            // And now we can actually remove the hazard while showing the skill popup for each
-            if ($hazard_to_remove['kind'] === 'battle'){
-                $this_battle->unset_attachment($hazard_to_remove['key'], $hazard_to_remove['token']);
-                if (!empty($hazard_to_remove['fxtoken'])){ $this_battle->unset_attachment($hazard_to_remove['key'], $hazard_to_remove['fxtoken']); }
-            } else if ($hazard_to_remove['kind'] === 'robot'){
-                $hazard_to_remove['robot']->unset_attachment($hazard_to_remove['token']);
-                if (!empty($hazard_to_remove['fxtoken'])){ $hazard_to_remove['robot']->unset_attachment($hazard_to_remove['fxtoken']); }
-                if (strstr($hazard_to_remove['token'], 'core-shield_')){ $hazard_to_remove['robot']->set_counter('item_disabled', 2); }
-            }
-
-            // Print a message showing that this effect is taking place
-            $shield_or_barrier = strstr($hazard_to_remove['token'], 'core-shield_') ? 'shield surrounding' : 'barrier blocking';
-            $hazard_to_remove['robot']->set_frame('taunt');
-            $this_robot->set_frame('taunt');
-            $this_battle->queue_sound_effect('debuff-received');
-            $this_battle->events_create($this_robot, false, $this_robot->robot_name.'\'s '.$this_skill->skill_name,
-                $this_robot->print_name().'\'s '.$this_skill->print_name().' skill kicked in!<br />'.
-                'The protective '.$shield_or_barrier.' '.$hazard_to_remove['robot']->print_name().' was removed!',
                 array(
                     'this_skill' => $this_skill,
                     'canvas_show_this_skill_overlay' => false,
                     'canvas_show_this_skill_underlay' => true,
                     'event_flag_camera_action' => true,
-                    'event_flag_camera_side' => $hazard_to_remove['robot']->player->player_side,
-                    'event_flag_camera_focus' => $hazard_to_remove['robot']->robot_position,
-                    'event_flag_camera_depth' => $hazard_to_remove['robot']->robot_key
+                    'event_flag_camera_side' => $barrier_to_remove['robot']->player->player_side,
+                    'event_flag_camera_focus' => $barrier_to_remove['robot']->robot_position,
+                    'event_flag_camera_depth' => $barrier_to_remove['robot']->robot_key
                     )
                 );
-            $this_robot->reset_frame();
-            $hazard_to_remove['robot']->reset_frame();
+            $barrier_to_remove['robot']->reset_frame();
+
+            // And now we can actually remove the hazard while showing the skill popup for each
+            if ($barrier_to_remove['kind'] === 'battle'){
+                $this_battle->unset_attachment($barrier_to_remove['key'], $barrier_to_remove['token']);
+                if (!empty($barrier_to_remove['fxtoken'])){ $this_battle->unset_attachment($barrier_to_remove['key'], $barrier_to_remove['fxtoken']); }
+            } else if ($barrier_to_remove['kind'] === 'robot'){
+                $barrier_to_remove['robot']->unset_attachment($barrier_to_remove['token']);
+                if (!empty($barrier_to_remove['fxtoken'])){ $barrier_to_remove['robot']->unset_attachment($barrier_to_remove['fxtoken']); }
+                if (strstr($barrier_to_remove['robot']->robot_item, '-core')){ $barrier_to_remove['robot']->set_counter('item_disabled', 3); }
+            }
+
+            // Print a message showing that this effect is taking place
+            $this_robot->set_frame('taunt');
+            $shield_or_barrier = strstr($barrier_to_remove['token'], 'core-shield_') ? 'shield surrounding' : 'barrier blocking';
+            $barrier_to_remove['robot']->set_frame('defend');
+            $this_battle->queue_sound_effect('debuff-received');
+            $this_battle->events_create($barrier_to_remove['robot'], false, $this_robot->robot_name.'\'s '.$this_skill->skill_name,
+                $this_robot->print_name().'\'s '.$this_skill->print_name().' skill kicked in!<br />'.
+                'The protective '.$shield_or_barrier.' '.$barrier_to_remove['robot']->print_name().' was removed!',
+                array(
+                    'this_skill' => $this_skill,
+                    'canvas_show_this_skill_overlay' => false,
+                    'canvas_show_this_skill_underlay' => true,
+                    'event_flag_camera_action' => true,
+                    'event_flag_camera_side' => $barrier_to_remove['robot']->player->player_side,
+                    'event_flag_camera_focus' => $barrier_to_remove['robot']->robot_position,
+                    'event_flag_camera_depth' => $barrier_to_remove['robot']->robot_key
+                    )
+                );
+            $barrier_to_remove['robot']->reset_frame();
 
         }
 
