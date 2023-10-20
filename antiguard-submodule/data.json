@@ -1,0 +1,13 @@
+{
+    "skill_token": "antiguard-submodule",
+    "skill_name": "Antiguard Submodule",
+    "skill_class": "skill",
+    "skill_description": "The robot disables protective shields at the end of the turn",
+    "skill_description2": "The robot employs expert knowledge of shields to disarm any of the opponent's barriers at the end of each turn.",
+    "skill_parameters": {
+        "objects": "auto"
+    },
+    "skill_flag_hidden": 0,
+    "skill_flag_complete": 1,
+    "skill_flag_published": 1
+}
