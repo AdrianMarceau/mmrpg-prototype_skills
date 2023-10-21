@@ -1,0 +1,11 @@
+{
+    "skill_token": "bulwark-submodule",
+    "skill_name": "Bulwark Submodule",
+    "skill_class": "skill",
+    "skill_description": "The robot protects benched allies from being targeted",
+    "skill_description2": "The robot's defense prowess protects benched allies from being targeted by the opponent's abilities.",
+    "skill_parameters": [],
+    "skill_flag_hidden": 0,
+    "skill_flag_complete": 1,
+    "skill_flag_published": 1
+}
