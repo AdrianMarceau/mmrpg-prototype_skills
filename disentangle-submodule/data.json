@@ -1,0 +1,11 @@
+{
+    "skill_token": "disentangle-submodule",
+    "skill_name": "Disentangle Submodule",
+    "skill_class": "skill",
+    "skill_description": "The robot frees itself of field hazards at the end of each turn",
+    "skill_description2": "The robot uses its skills to remove any negative field hazards affecting it at the end of each turn.",
+    "skill_parameters": [],
+    "skill_flag_hidden": 0,
+    "skill_flag_complete": 1,
+    "skill_flag_published": 1
+}
