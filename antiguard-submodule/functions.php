@@ -54,14 +54,18 @@ $functions = array(
                             $attachment_token
                             );
                         }
-                    if (strstr($side_position, 'bench-')){ list($side, $position, $key) = explode('-', $attachment_token_context); }
-                    else { list($side, $position) = explode('-', $attachment_token_context); $key = 0; }
-                    $robot = array_filter($target_player_robots, function($info) use ($side, $position, $key){
+                    if (!strstr($side_position, 'bench-')){  $key = 0; list($side, $position) = explode('-', $attachment_token_context);  }
+                    else { list($side, $position, $key) = explode('-', $attachment_token_context); $key = (int)($key);  }
+                    $robot = false;
+                    $robots = array_filter($this_player_robots, function($info) use ($side, $position, $key){
                         if ($info['robot_position'] !== $position){ return false; }
-                        if ($position === 'bench' && $info['robot_key'] !== $key){ return false; }
+                        elseif ($info['robot_key'] !== $key){ return false; }
                         return true;
                         });
-                    if (!empty($robot)){ $robot = rpg_game::get_robot_by_id($robot[0]['robot_id']); }
+                    if (!empty($robots)){
+                        $info = array_values($robots)[0];
+                        $robot = rpg_game::get_robot_by_id($info['robot_id']);
+                    }
                     $positions_of_interest[] = array(
                         'kind' => 'battle',
                         'key' => $side_position,
