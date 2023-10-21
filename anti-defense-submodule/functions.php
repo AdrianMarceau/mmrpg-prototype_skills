@@ -95,7 +95,6 @@ $functions = array(
             // Show the camera looking at this robot first
             $this_robot->set_frame('summon');
             $stat_to_remove['robot']->set_frame('base');
-            $this_battle->queue_sound_effect('scan-start');
             $this_battle->events_create($this_robot, false, '', '',
                 array(
                     'this_skill' => $this_skill,

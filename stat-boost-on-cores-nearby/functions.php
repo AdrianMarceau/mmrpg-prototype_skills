@@ -79,7 +79,6 @@ $functions = array(
         // Loop through and show the camera looking at them one-by-one
         foreach ($robots_of_interest AS $key => $player_and_robot){
             $player_and_robot['robot']->set_frame('defend');
-            $this_battle->queue_sound_effect('scan-start');
             $this_battle->events_create($this_robot, false, '', '',
                 array(
                     'event_flag_camera_action' => true,

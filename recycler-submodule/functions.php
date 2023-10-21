@@ -94,7 +94,6 @@ $functions = array(
 
             // Show the camera looking at this robot first
             $item_to_recycle['robot']->set_frame('defend');
-            $this_battle->queue_sound_effect('scan-start');
             $this_battle->events_create($this_robot, false, '', '',
                 array(
                     'event_flag_camera_action' => true,

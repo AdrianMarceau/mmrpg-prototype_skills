@@ -24,7 +24,7 @@ $functions = array(
 
         // Print a message showing that this effect is taking place
         $this_robot->set_frame('defend');
-        $this_battle->queue_sound_effect('scan-start');
+        $this_battle->queue_sound_effect('downward-impact');
         $this_battle->events_create($this_robot, false, $this_robot->robot_name.'\'s '.$this_skill->skill_name,
             $this_robot->print_name().'\'s '.$this_skill->print_name().' skill kicked in!<br />'.
             $this_robot->get_pronoun('subject').' decided to recover some health by resting!',
