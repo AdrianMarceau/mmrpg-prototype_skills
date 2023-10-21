@@ -44,6 +44,30 @@ $functions = array(
             }
         }
 
+        // Collect a list of active robots from this player so we can loop through 'em
+        $this_player_robot = $this_player->values['robots_active'];
+        if (!isset($this_robot)){ $this_robot = $this_player->get_active_robot(); }
+
+        // Collect a list of robots from this player and then loop through 'em
+        if (!empty($this_player_robot)){
+            foreach ($this_player_robot AS $robot_key => $robot_info){
+                if ($robot_info['robot_id'] === $this_robot->robot_id){ $robot = $this_robot; }
+                else { $robot = rpg_game::get_robot($this_battle, $this_player, array('robot_id' => $robot_info['robot_id'])); }
+                if (empty($robot)){ unset($robot); continue; }
+                // Check to see if this robot's stat has been modified
+                $anti_stat_value = isset($robot->counters[$anti_stat_token.'_mods']) ? $robot->counters[$anti_stat_token.'_mods'] : 0;
+                if ($anti_stat_value > 0 || $anti_stat_value < 0){
+                    $positions_of_interest[] = array(
+                        'stat' => $anti_stat_token,
+                        'value' => $anti_stat_value,
+                        'player' => $this_player,
+                        'robot' => $robot,
+                        );
+                }
+                unset($robot);
+            }
+        }
+
         // If there aren't any points of interest, we should return now
         if (empty($positions_of_interest)){ return false; }
 
