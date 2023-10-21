@@ -1,0 +1,11 @@
+{
+    "skill_token": "recycler-submodule",
+    "skill_name": "Recycler Submodule",
+    "skill_class": "skill",
+    "skill_description": "The robot can reuse consumable items multiple times",
+    "skill_description2": "The robot is able to recycle previously consumed items into new forms for itself and allies before each turn.",
+    "skill_parameters": [],
+    "skill_flag_hidden": 0,
+    "skill_flag_complete": 0,
+    "skill_flag_published": 1
+}
