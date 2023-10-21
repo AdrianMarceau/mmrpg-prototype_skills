@@ -32,7 +32,7 @@ $functions = array(
         // Print a message showing that this effect is taking place
         if ($bulwark_added){
             $this_robot->set_frame('taunt');
-            $this_battle->queue_sound_effect('scan-start');
+            $this_battle->queue_sound_effect('hyper-stomp-sound');
             $this_battle->events_create($this_robot, false, $this_robot->robot_name.'\'s '.$this_skill->skill_name,
                 $this_robot->print_name().'\'s '.$this_skill->print_name().' skill kicked in!<br />'.
                 'Benched robots can\'t be targeted as long as '.$this_robot->get_pronoun('subject').' remains active!',
