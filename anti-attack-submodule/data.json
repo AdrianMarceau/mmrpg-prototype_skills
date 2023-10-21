@@ -1,0 +1,11 @@
+{
+    "skill_token": "anti-attack-submodule",
+    "skill_name": "Anti-Attack Submodule",
+    "skill_class": "skill",
+    "skill_description": "The robot nullifies attack stat changes at the end of each turn",
+    "skill_description2": "The robot uses its expert skills to nullify any attack stat changes on other robots at the end of each turn.",
+    "skill_parameters": [],
+    "skill_flag_hidden": 0,
+    "skill_flag_complete": 1,
+    "skill_flag_published": 1
+}
