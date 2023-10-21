@@ -47,8 +47,10 @@ $functions = array(
         $target_robot = $options->damage_target;
 
         // Make sure the target has a weakness to this robot's move, else return early
-        if (!$target_robot->has_weakness($this_ability->ability_type)
-            && !$target_robot->has_weakness($this_ability->ability_type2)){
+        $num_weaknesses = 0;
+        if ($target_robot->has_weakness($this_ability->ability_type)){ $num_weaknesses++; }
+        if ($target_robot->has_weakness($this_ability->ability_type2)){ $num_weaknesses++; }
+        if (empty($num_weaknesses)){
             return false;
         }
 
@@ -71,7 +73,7 @@ $functions = array(
         $this_robot->reset_frame();
 
         // Otherwise, we can straight-up double the damage amount because that's the effect
-        $options->damage_amount *= 2;
+        $options->damage_amount *= 1 + $num_weaknesses;
 
         // Return true on success
         return true;
