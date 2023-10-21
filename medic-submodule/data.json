@@ -1,0 +1,11 @@
+{
+    "skill_token": "medic-submodule",
+    "skill_name": "Medic Submodule",
+    "skill_class": "skill",
+    "skill_description": "The robot can heal allies from the bench at the end of each turn",
+    "skill_description2": "The robot can restore lost health to wounded allies at the end of each turn so long as it remains on the bench.",
+    "skill_parameters": [],
+    "skill_flag_hidden": 0,
+    "skill_flag_complete": 1,
+    "skill_flag_published": 1
+}
