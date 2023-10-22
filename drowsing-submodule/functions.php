@@ -49,7 +49,7 @@ $functions = array(
             'success' => array(0, -2, 0, -10, $this_robot->print_name().'\'s energy was restored!'),
             'failure' => array(9, -2, 0, -10, $this_robot->print_name().'\'s energy was not affected...')
             ));
-        $energy_recovery_percent = 10;
+        $energy_recovery_percent = 20;
         $energy_recovery_amount = ceil($this_robot->robot_base_energy * ($energy_recovery_percent / 100));
         $trigger_options = array('apply_modifiers' => true, 'apply_position_modifiers' => false, 'apply_stat_modifiers' => false);
         $this_robot->trigger_recovery($this_robot, $this_skill, $energy_recovery_amount, true, $trigger_options);
