@@ -76,7 +76,7 @@ $functions = array(
             else { $this_skill->skill_results['flag_'.$this_skill->skill_token.'_triggered'] = true; }
             $options->header_text = $this_robot->robot_name.'\'s '.$this_skill->skill_name;
             $options->extra_text = $this_robot->print_name().'\'s '.$this_skill->print_name().' prevents '.$this_skill->skill_parameters['stat'].' loss! ';
-            $options->extra_text .= '<br /> '.$this_robot->print_name().'\'s '.$options->stat_type.' was not '.($options->break_amount > 0 ? 'lowered' : 'raised').'!';
+            $options->extra_text .= '<br /> '.$this_robot->print_name().'\'s '.$options->stat_type.' was not lowered!';
             $this_robot->set_frame('defend');
             $this_battle->events_create($this_robot, false, $options->header_text, $options->extra_text, array(
                     'this_skill' => $this_skill,
