@@ -26,7 +26,7 @@ $functions = array(
         $this_robot->set_frame('defend');
         $this_battle->queue_sound_effect('downward-impact');
         $this_battle->events_create($this_robot, false, $this_robot->robot_name.'\'s '.$this_skill->skill_name,
-            $this_robot->print_name().'\'s '.$this_skill->print_name().' skill kicked in!<br />'.
+            $this_robot->print_name().'\'s '.$this_skill->print_name().' skill kicked in! <br />'.
             ucfirst($this_robot->get_pronoun('subject')).' decided to recover some health by resting!',
             array(
                 'this_skill' => $this_skill,
@@ -51,7 +51,7 @@ $functions = array(
             ));
         $energy_recovery_percent = 20;
         $energy_recovery_amount = ceil($this_robot->robot_base_energy * ($energy_recovery_percent / 100));
-        $trigger_options = array('apply_modifiers' => true, 'apply_position_modifiers' => false, 'apply_stat_modifiers' => false);
+        $trigger_options = array('apply_modifiers' => true, 'apply_position_modifiers' => false, 'apply_stat_modifiers' => false, 'canvas_show_this_skill' => false);
         $this_robot->trigger_recovery($this_robot, $this_skill, $energy_recovery_amount, true, $trigger_options);
 
         // Call the global stat boost function with customized options
@@ -59,7 +59,8 @@ $functions = array(
         rpg_ability::ability_function_stat_break($this_robot, 'speed', 1, $this_skill, array(
             'success_frame' => 9,
             'failure_frame' => 9,
-            'extra_text' => $trigger_text
+            'extra_text' => $trigger_text,
+            'skip_canvas_header' => true
             ));
 
         // Return true on success
