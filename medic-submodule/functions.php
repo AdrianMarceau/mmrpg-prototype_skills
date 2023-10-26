@@ -45,7 +45,7 @@ $functions = array(
         if (empty($positions_of_interest)){ return false; }
 
         // Otherwise, print a message showing that this effect is taking place
-        $certain_text = count($positions_of_interest) === 1 ? 'a wounded ally' : 'wounded allies';
+        $certain_text = count($positions_of_interest) === 1 ? 'a wounded robot' : 'wounded robots';
         $this_robot->set_frame('taunt');
         $this_battle->queue_sound_effect('scan-start');
         $this_battle->events_create($this_robot, false, $this_robot->robot_name.'\'s '.$this_skill->skill_name,
