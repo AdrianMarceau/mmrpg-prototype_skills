@@ -69,7 +69,7 @@ $functions = array(
             if ($this_robot->counters[$boost_stat.'_mods'] < MMRPG_SETTINGS_STATS_MOD_MAX){
                 // If this robot has a stat-based skill, display the trigger text separately
                 $trigger_text = $this_robot->print_name().'\'s '.$this_skill->print_name().' skill kicked in!';
-                if (!empty($this_robot->robot_item) && preg_match('/^(guard|reverse|xtreme)-module$/', $this_robot->robot_item)){
+                if ($this_robot->has_item() && preg_match('/^(guard|reverse|xtreme)-module$/', $this_robot->robot_item)){
                     $this_skill->target_options_update(array('frame' => 'summon', 'success' => array(9, 0, 0, -10, $trigger_text)));
                     $this_robot->trigger_target($this_robot, $this_skill, array('prevent_default_text' => true));
                     $trigger_text = '';
