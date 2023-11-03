@@ -1,0 +1,11 @@
+{
+    "skill_token": "custom-skill",
+    "skill_name": "Custom Skill",
+    "skill_class": "skill",
+    "skill_description": "This is not a real skill.  It exists to be overwritten.",
+    "skill_description2": "The robot has a skill so specific it cannot be applied to other robots.  This custom skill placeholder thus needs to be overwritten with custom text.",
+    "skill_parameters": [],
+    "skill_flag_hidden": 0,
+    "skill_flag_complete": 1,
+    "skill_flag_published": 1
+}
