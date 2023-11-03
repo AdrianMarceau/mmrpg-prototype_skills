@@ -63,6 +63,7 @@ $functions = array(
         $this_robot->reset_frame();
 
         // Loop through and show the camera looking at them one-by-one
+        $energy_recovery_percent = ceil(30 / count($positions_of_interest));
         foreach ($positions_of_interest AS $key => $recipient){
 
             // Show the camera looking at this robot first
@@ -80,6 +81,7 @@ $functions = array(
                     )
                 );
             $recipient['robot']->reset_frame();
+            $this_robot->reset_frame();
 
             // Increase this robot's energy stat
             $this_skill->recovery_options_update(array(
@@ -90,10 +92,11 @@ $functions = array(
                 'success' => array(0, -2, 0, -10, $recipient['robot']->print_name().'\'s energy was restored!'),
                 'failure' => array(9, -2, 0, -10, $recipient['robot']->print_name().'\'s energy was not affected...')
                 ));
-            $energy_recovery_percent = 10;
+            //$energy_recovery_percent = 10;
             $energy_recovery_amount = ceil($recipient['robot']->robot_base_energy * ($energy_recovery_percent / 100));
             $trigger_options = array('apply_modifiers' => true, 'apply_position_modifiers' => false, 'apply_stat_modifiers' => false);
             $recipient['robot']->trigger_recovery($this_robot, $this_skill, $energy_recovery_amount, true, $trigger_options);
+            $this_robot->reset_frame();
 
         }
 
