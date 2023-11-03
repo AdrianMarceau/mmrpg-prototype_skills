@@ -10,10 +10,10 @@ $functions = array(
 
         // Turn ON the priority-blocking feature of this skill
         // by adding this robot's ID to the player's metronome list
-        $metronome_robots = $this_player->get_value('metronome_robots');
+        $metronome_robots = $this_player->get_value('anti_priority_robots');
         if (empty($metronome_robots)){ $metronome_robots = array(); }
         if (!in_array($this_robot->robot_id, $metronome_robots)){ $metronome_robots[] = $this_robot->robot_id; }
-        $this_player->set_value('metronome_robots', $metronome_robots);
+        $this_player->set_value('anti_priority_robots', $metronome_robots);
 
         // Print a message showing that this effect is taking place
         $this_robot->set_frame('taunt');
@@ -47,10 +47,10 @@ $functions = array(
 
         // Turn OFF the priority-blocking feature of this skill
         // by removing this robot's ID to the player's metronome list
-        $metronome_robots = $this_player->get_value('metronome_robots');
+        $metronome_robots = $this_player->get_value('anti_priority_robots');
         if (empty($metronome_robots)){ $metronome_robots = array(); }
         if (in_array($this_robot->robot_id, $metronome_robots)){ $metronome_robots = array_diff($metronome_robots, array($this_robot->robot_id)); }
-        $this_player->set_value('metronome_robots', $metronome_robots);
+        $this_player->set_value('anti_priority_robots', $metronome_robots);
 
         // Return true on success
         return true;
