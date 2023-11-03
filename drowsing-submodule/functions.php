@@ -22,6 +22,12 @@ $functions = array(
         $target_player = $this_player->other_player;
         $target_robot = $target_player->get_active_robot();
 
+        // If this robot's speed is already at minimum (or maximum w/ reverse), the skill doesn't activate
+        $invert_logic = false;
+        if ($this_robot->has_item() && $this_robot->robot_item === 'reverse-module'){ $invert_logic = true; }
+        if (!$invert_logic && $this_robot->counters['speed_mods'] <= MMRPG_SETTINGS_STATS_MOD_MIN){ return false; }
+        else if ($invert_logic && $this_robot->counters['speed_mods'] >= MMRPG_SETTINGS_STATS_MOD_MAX){ return false; }
+
         // Print a message showing that this effect is taking place
         $this_robot->set_frame('defend');
         $this_battle->queue_sound_effect('downward-impact');
@@ -40,6 +46,15 @@ $functions = array(
             );
         $this_robot->reset_frame();
 
+        // Call the global stat boost function with customized options
+        $trigger_text = 'The resting slowed '.$this_robot->print_name().'\'s movement!';
+        rpg_ability::ability_function_stat_break($this_robot, 'speed', 1, $this_skill, array(
+            'success_frame' => 9,
+            'failure_frame' => 9,
+            'extra_text' => $trigger_text,
+            'skip_canvas_header' => true
+            ));
+
         // Increase this robot's energy stat
         $this_skill->recovery_options_update(array(
             'kind' => 'energy',
@@ -47,21 +62,13 @@ $functions = array(
             'modifiers' => true,
             'frame' => 'taunt',
             'success' => array(0, -2, 0, -10, $this_robot->print_name().'\'s energy was restored!'),
-            'failure' => array(9, -2, 0, -10, $this_robot->print_name().'\'s energy was not affected...')
+            'failure' => array(9, -2, 0, -10, '...but '.$this_robot->print_name().'\'s energy was not affected!')
             ));
-        $energy_recovery_percent = 20;
+        $energy_recovery_percent = $this_robot->robot_position === 'bench' ? 20 : 10;
         $energy_recovery_amount = ceil($this_robot->robot_base_energy * ($energy_recovery_percent / 100));
         $trigger_options = array('apply_modifiers' => true, 'apply_position_modifiers' => false, 'apply_stat_modifiers' => false, 'canvas_show_this_skill' => false);
         $this_robot->trigger_recovery($this_robot, $this_skill, $energy_recovery_amount, true, $trigger_options);
 
-        // Call the global stat boost function with customized options
-        $trigger_text = '...but the resting slowed '.$this_robot->print_name().'\'s movement!';
-        rpg_ability::ability_function_stat_break($this_robot, 'speed', 1, $this_skill, array(
-            'success_frame' => 9,
-            'failure_frame' => 9,
-            'extra_text' => $trigger_text,
-            'skip_canvas_header' => true
-            ));
 
         // Return true on success
         return true;
