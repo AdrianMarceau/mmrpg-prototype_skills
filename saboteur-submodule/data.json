@@ -1,0 +1,11 @@
+{
+    "skill_token": "saboteur-submodule",
+    "skill_name": "Saboteur Submodule",
+    "skill_class": "skill",
+    "skill_description": "Prevents the use of recovery moves on the field",
+    "skill_description2": "The robot nullifies the effects of all life and weapon energy recovery moves so long as it remains on the field.",
+    "skill_parameters": [],
+    "skill_flag_hidden": 0,
+    "skill_flag_complete": 1,
+    "skill_flag_published": 1
+}
