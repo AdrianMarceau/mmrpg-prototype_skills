@@ -9,6 +9,9 @@ Required:
     - stat (string: attack/defense/speed)
     - amount (integer: 1 - 5)
 
+Optional:
+    - position (string: any/active/bench)
+
 Examples:
     {"robots":"mega-man,proto-man","stat":"attack","amount":1} // note the STRING format list of robot tokens
         would boost attack by one stage when either mega man or proto man are on the field
@@ -28,11 +31,22 @@ $functions = array(
         if (empty($this_skill->flags['validated'])){ return false; }
 
         // Collect parameters that have been provided and are valid
+        $boost_position = $this_skill->skill_parameters['position'];
         $boost_robots = $this_skill->skill_parameters['robots'];
         $boost_robots = !empty($boost_robots) ? explode(',', $boost_robots) : array();
         $boost_stat = $this_skill->skill_parameters['stat'];
         $boost_stats = $boost_stat === 'all' ? array('attack', 'defense', 'speed') : array($boost_stat);
         $boost_amount = $this_skill->skill_parameters['amount'];
+
+        // If this skill only triggers in a specific position, check that now
+        //error_log('$this_skill->skill_parameters = '.print_r($this_skill->skill_parameters, true));
+        //error_log('boost_position = '.print_r($boost_position, true));
+        //error_log('this_robot->robot_position = '.print_r($this_robot->robot_position, true));
+        if (!empty($boost_position)
+            && $boost_position !== 'either'
+            && $this_robot->robot_position !== $boost_position){
+            return;
+        }
 
         // Check to see if there are any robots able to trigger this skill
         $robots_of_interest = array();
@@ -111,9 +125,11 @@ $functions = array(
 
     },
     'skill_function_onload' => function($objects){
+        //error_log('skill_function_onload()');
 
         // Extract objects into the global scope
         extract($objects);
+        //error_log('$this_skill->skill_parameters = '.print_r($this_skill->skill_parameters, true));
 
         // Default to this skill being validated and go from there
         $this_skill->set_flag('validated', true);
@@ -154,17 +170,19 @@ $functions = array(
             $this_skill->skill_parameters['amount'] = intval($this_skill->skill_parameters['amount']);
         }
 
-        // Validate the "repeat" parameter has been set to a valid value, else use default
-        if (isset($this_skill->skill_parameters['repeat'])){
-            if (!is_bool($this_skill->skill_parameters['repeat'])){
-                error_log('skill parameter "repeat" was not a boolean value ('.$this_skill->skill_token.':'.__LINE__.')');
-                error_log('repeat = '.print_r($this_skill->skill_parameters['repeat'], true));
-                $this_skill->set_flag('validated', false);
-                return false;
+        // Validate the "position" parameter has been set to a valid value
+        $allowed_positions = array('', 'either', 'active', 'bench');
+        if (isset($this_skill->skill_parameters['position'])
+            && !in_array($this_skill->skill_parameters['position'], $allowed_positions)){
+            error_log('skill parameter "position" was not set or was invalid ('.$this_skill->skill_token.':'.__LINE__.')');
+            if (isset($this_skill->skill_parameters['position'])){
+                error_log('position = '.print_r($this_skill->skill_parameters['position'], true));
             }
-        } else {
-            // Otherwise make sure this is in a proper boolean format
-            $this_skill->skill_parameters['repeat'] = true;
+            $this_skill->set_flag('validated', false);
+            return false;
+        } elseif (!isset($this_skill->skill_parameters['position'])){
+            // Otherwise make sure this at least exists in a proper string
+            $this_skill->skill_parameters['position'] = $allowed_positions[0];
         }
 
         // Everything is fine so let's return true
@@ -176,6 +194,9 @@ $functions['rpg-robot_check-skills_battle-start'] = function($objects) use ($fun
     return $functions['robot_function_on-robots-nearby']($objects, true);
 };
 $functions['rpg-robot_check-skills_turn-start'] = function($objects) use ($functions){
+    return $functions['robot_function_on-robots-nearby']($objects, true);
+};
+$functions['rpg-robot_check-skills_end-of-turn'] = function($objects) use ($functions){
     return $functions['robot_function_on-robots-nearby']($objects, true);
 };
 ?>

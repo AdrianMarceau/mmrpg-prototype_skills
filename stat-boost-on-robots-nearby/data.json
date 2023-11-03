@@ -7,7 +7,8 @@
     "skill_parameters": {
         "robots": "none",
         "stat": "none",
-        "amount": 0
+        "amount": 0,
+        "position": "either"
     },
     "skill_flag_hidden": 0,
     "skill_flag_complete": 1,
