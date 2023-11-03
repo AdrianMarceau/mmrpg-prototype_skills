@@ -2,7 +2,7 @@
     "skill_token": "overkill-submodule",
     "skill_name": "Overkill Submodule",
     "skill_class": "skill",
-    "skill_description": "The robot does extra damage when the target has a weakness",
+    "skill_description": "Deals extra damage when the target has a weakness",
     "skill_description2": "The robot puts effort into doing more damage when it knows the target has a weakness to one of its moves.",
     "skill_parameters": [],
     "skill_flag_hidden": 0,
