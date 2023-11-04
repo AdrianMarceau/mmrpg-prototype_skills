@@ -4,7 +4,9 @@
     "skill_class": "skill",
     "skill_description": "Slows down to rest and recover lost health at the end of each turn",
     "skill_description2": "The robot takes a break in the middle of battle to recover lost health but loses some speed in doing so.",
-    "skill_parameters": [],
+    "skill_parameters": {
+        "stat": "none"
+    },
     "skill_flag_hidden": 0,
     "skill_flag_complete": 1,
     "skill_flag_published": 1
