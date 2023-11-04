@@ -9,11 +9,11 @@ $functions = array(
         extract($objects);
 
         // Turn ON the priority-blocking feature of this skill
-        // by adding this robot's ID to the player's saboteur list
-        $saboteur_robots = $this_player->get_value('anti_recovery_robots');
-        if (empty($saboteur_robots)){ $saboteur_robots = array(); }
-        if (!in_array($this_robot->robot_id, $saboteur_robots)){ $saboteur_robots[] = $this_robot->robot_id; }
-        $this_player->set_value('anti_recovery_robots', $saboteur_robots);
+        // by adding this robot's ID to the player's anti_recovery list
+        $anti_recovery_robots = $this_player->get_value('anti_recovery_robots');
+        if (empty($anti_recovery_robots)){ $anti_recovery_robots = array(); }
+        if (!in_array($this_robot->robot_id, $anti_recovery_robots)){ $anti_recovery_robots[] = $this_robot->robot_id; }
+        $this_player->set_value('anti_recovery_robots', $anti_recovery_robots);
 
         // Print a message showing that this effect is taking place
         $this_robot->set_frame('taunt');
@@ -46,11 +46,11 @@ $functions = array(
         if ($this_robot !== $options->disabled_target){ return false; }
 
         // Turn OFF the priority-blocking feature of this skill
-        // by removing this robot's ID to the player's saboteur list
-        $saboteur_robots = $this_player->get_value('anti_recovery_robots');
-        if (empty($saboteur_robots)){ $saboteur_robots = array(); }
-        if (in_array($this_robot->robot_id, $saboteur_robots)){ $saboteur_robots = array_diff($saboteur_robots, array($this_robot->robot_id)); }
-        $this_player->set_value('anti_recovery_robots', $saboteur_robots);
+        // by removing this robot's ID to the player's anti_recovery list
+        $anti_recovery_robots = $this_player->get_value('anti_recovery_robots');
+        if (empty($anti_recovery_robots)){ $anti_recovery_robots = array(); }
+        if (in_array($this_robot->robot_id, $anti_recovery_robots)){ $anti_recovery_robots = array_diff($anti_recovery_robots, array($this_robot->robot_id)); }
+        $this_player->set_value('anti_recovery_robots', $anti_recovery_robots);
 
         // Return true on success
         return true;
