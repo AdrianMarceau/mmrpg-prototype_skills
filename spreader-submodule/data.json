@@ -1,0 +1,11 @@
+{
+    "skill_token": "spreader-submodule",
+    "skill_name": "Spreader Submodule",
+    "skill_class": "skill",
+    "skill_description": "Improves the robot's hazard-setting capabilities",
+    "skill_description2": "Improves the robot's hazard-setting capabilities allowing them to generate multiple field hazards at once.",
+    "skill_parameters": [],
+    "skill_flag_hidden": 0,
+    "skill_flag_complete": 1,
+    "skill_flag_published": 1
+}
