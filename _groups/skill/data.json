@@ -19,7 +19,8 @@
             "bulwark-submodule",
             "saboteur-submodule",
             "metronome-submodule",
-            "hyperscan-submodule"
+            "hyperscan-submodule",
+            "nightmare-submodule"
         ]
     },
     "Proficiency Submodules": {
@@ -30,7 +31,8 @@
             "boost-submodule",
             "break-submodule",
             "tenacity-submodule",
-            "overkill-submodule"
+            "overkill-submodule",
+            "spreader-submodule"
         ]
     },
     "Mechanical Submodules": {
