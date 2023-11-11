@@ -1,0 +1,11 @@
+{
+    "skill_token": "defense-assist-submodule",
+    "skill_name": "Defense-Assist Submodule",
+    "skill_class": "skill",
+    "skill_description": "Boosts defense from the bench at the end of each turn",
+    "skill_description2": "This robot boosts the active robot's defense stat at the end of each turn so long as it remains on the bench.",
+    "skill_parameters": [],
+    "skill_flag_hidden": 0,
+    "skill_flag_complete": 1,
+    "skill_flag_published": 1
+}
