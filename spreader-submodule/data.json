@@ -3,7 +3,7 @@
     "skill_name": "Spreader Submodule",
     "skill_class": "skill",
     "skill_description": "Generates multiple field hazards at a time",
-    "skill_description2": "Allows the robot to generate multiple field hazards at once when using relevant abilities.",
+    "skill_description2": "Allows the robot to generate multiple field hazards at once when using abilities.",
     "skill_parameters": [],
     "skill_flag_hidden": 0,
     "skill_flag_complete": 1,
