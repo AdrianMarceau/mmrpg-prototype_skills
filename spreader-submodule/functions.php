@@ -4,7 +4,7 @@ $functions = array(
         return true;
     },
     'rpg-robot_trigger-ability_before' => function($objects){
-        //error_log('rpg-robot_trigger-ability_before() for '.$objects['this_robot']->robot_string.' vs '.$objects['target_robot']->robot_string);
+        //error_log('rpg-robot_trigger-ability_before() for '.$objects['this_robot']->robot_string);
 
         // Extract objects into the global scope
         extract($objects);
@@ -15,75 +15,47 @@ $functions = array(
         // If this robot is not active, the skill doesn't activate
         if ($this_robot->robot_position !== 'active'){ return false; }
 
-        // Save a snapshot of the target's attachment tokens, if any, so we can see what's new
-        $start_target_attachment_tokens = array();
-        if (!empty($target_robot)){
-            $start_target_attachments = $target_robot->get_attachments();
-            $start_target_attachment_tokens = !empty($start_target_attachments) ? array_keys($start_target_attachments) : array();
-            //error_log('$start_target_attachments = '.print_r($start_target_attachments, true));
-            //error_log('$start_target_attachment_tokens = '.print_r($start_target_attachment_tokens, true));
-        }
-        $this_robot->set_value('watching_target_attachment_tokens', $start_target_attachment_tokens);
-
         // Also save a snapshot of the field attachment tokens, if any, so we can see what's new
-        $field_position = $target_robot->player->player_side.'-'.$target_robot->robot_position;
-        if ($target_robot->robot_position === 'bench'){ $field_position .= '-'.$target_robot->robot_key; }
+        $position_key = $target_robot->get_static_attachment_key();
         $start_field_attachments = $this_battle->get_attachments();
-        $start_field_attachment_tokens = !empty($start_field_attachments[$field_position]) ? array_keys($start_field_attachments[$field_position]) : array();
-        //error_log('$start_field_attachments = '.print_r($start_field_attachments, true));
-        //error_log('$start_field_attachment_tokens = '.print_r($start_field_attachment_tokens, true));
+        $start_field_attachment_tokens = !empty($start_field_attachments[$position_key]) ? array_keys($start_field_attachments[$position_key]) : array();
         $this_robot->set_value('watching_field_attachment_tokens', $start_field_attachment_tokens);
 
         // Return true on success
         return true;
 
     },
-    'rpg-ability_trigger-damage_after' => function($objects){
-        //error_log('rpg-ability_trigger-damage_after() for '.$objects['this_robot']->robot_string.' w/ ability '.$objects['this_ability']->ability_name);
+    'rpg-robot_trigger-ability_after' => function($objects){
+        //error_log('rpg-robot_trigger-ability_after() for '.$objects['this_robot']->robot_string.' w/ ability '.$objects['this_ability']->ability_token);
 
         // Extract objects into the global scope
         extract($objects);
 
-        // If this robot is not the aggressor, the skill doesn't activate
-        if ($options->damage_initiator !== $this_robot){ return false; }
-        if (empty($options->damage_target)){ return false; }
-        $target_robot = $options->damage_target;
-
-        // Collect the snapshot of the target's attachment tokens, if any, so we can see what's new
-        $old_target_attachment_tokens = $this_robot->get_value('watching_target_attachment_tokens');
-        if (!is_array($old_target_attachment_tokens)){ $old_target_attachment_tokens = array(); }
-        $this_robot->unset_value('watching_target_attachment_tokens');
-        $new_target_attachments = $target_robot->get_attachments();
-        $new_target_attachment_tokens = !empty($new_target_attachments) ? array_keys($new_target_attachments) : array();
-        //error_log('$old_target_attachment_tokens = '.print_r($old_target_attachment_tokens, true));
-        //error_log('$new_target_attachment_tokens = '.print_r($new_target_attachment_tokens, true));
-        // Collect the difference between the old and new attachment tokens
-        $target_attachment_tokens_added = array_diff($new_target_attachment_tokens, $old_target_attachment_tokens);
-        $target_attachments_added = array();
-        if (!empty($target_attachment_tokens_added)){
-            foreach ($target_attachment_tokens_added AS $token){
-                $target_attachments_added[$token] = $new_target_attachments[$token];
-            }
-        }
-        //error_log('$target_attachment_tokens_added = '.print_r($target_attachment_tokens_added, true));
+        // If this robot does not own the activating ability, it's not relevant
+        if ($this_ability->robot !== $this_robot){ return false; }
 
         // Collect the snapshot of the field attachment tokens, if any, so we can see what's new
         $old_field_attachment_tokens = $this_robot->get_value('watching_field_attachment_tokens');
         if (!is_array($old_field_attachment_tokens)){ $old_field_attachment_tokens = array(); }
         $this_robot->unset_value('watching_field_attachment_tokens');
-        $field_position = $target_robot->player->player_side.'-'.$target_robot->robot_position;
-        if ($target_robot->robot_position === 'bench'){ $field_position .= '-'.$target_robot->robot_key; }
+        $position_key = $target_robot->get_static_attachment_key();
         $new_field_attachments = $this_battle->get_attachments();
-        $new_field_attachment_tokens = !empty($new_field_attachments[$field_position]) ? array_keys($new_field_attachments[$field_position]) : array();
-        //error_log('$old_field_attachment_tokens = '.print_r($old_field_attachment_tokens, true));
-        //error_log('$new_field_attachment_tokens = '.print_r($new_field_attachment_tokens, true));
+        $new_field_attachment_tokens = !empty($new_field_attachments[$position_key]) ? array_keys($new_field_attachments[$position_key]) : array();
+
+        // Collect the index of negative field hazards so and then filter new attachment tokens to only relevant
+        $negative_field_hazards = rpg_ability::get_negative_field_hazard_index();
+        $negative_field_hazards_allowed = array_map(function($hazard){ return $hazard['source'].'_'.$hazard['object']; }, $negative_field_hazards);
+        //error_log('negative_field_hazards_allowed: '.print_r($negative_field_hazards_allowed, true));
+
         // Collect the difference between the old and new attachment tokens
         $field_attachment_tokens_added = array_diff($new_field_attachment_tokens, $old_field_attachment_tokens);
-        //error_log('$field_attachment_tokens_added = '.print_r($field_attachment_tokens_added, true));
         $field_attachments_added = array();
         if (!empty($field_attachment_tokens_added)){
             foreach ($field_attachment_tokens_added AS $token){
-                $field_attachments_added[$token] = $new_field_attachments[$field_position][$token];
+                $inner_token = preg_replace('/^(ability)_([-_a-z0-9]+)_([-a-z0-9]+)$/i', '$2', $token);
+                //error_log('$inner_token: '.print_r($inner_token, true));
+                if (!in_array($inner_token, $negative_field_hazards_allowed)){ continue; }
+                $field_attachments_added[$token] = $new_field_attachments[$position_key][$token];
             }
         }
 
@@ -122,24 +94,14 @@ $functions = array(
                 // Define flag to see if attachments added at all
                 $attachments_added = false;
 
-                // If there were robot attachments to spread, make sure this robot had 'em
-                if (!empty($target_attachments_added)){
-                    foreach ($target_attachments_added AS $token => $attachment){
-                        if ($robot->has_attachment($token)){ continue; }
-                        $robot->set_attachment($token, $attachment);
-                        $attachments_added = true;
-                    }
-                }
-
                 // If there were field attachments to spread, let's do it to all the other active robots
-                $field_position = $robot->player->player_side.'-'.$robot->robot_position;
-                if ($robot->robot_position === 'bench'){ $field_position .= '-'.$robot->robot_key; }
+                $position_key = $robot->get_static_attachment_key();
                 if (!empty($field_attachments_added)){
                     foreach ($field_attachments_added AS $token => $attachment){
-                        $attachment['attachment_token'] = preg_replace('/_([-a-z0-9]+)$/i', '_'.$field_position, $token);
-                        if ($this_battle->has_attachment($field_position, $attachment['attachment_token'])){ continue; }
-                        $this_battle->set_attachment($field_position, $attachment['attachment_token'], $attachment);
-                        //error_log('set_attachment('.$field_position.', '.$attachment['attachment_token'].', '.print_r($attachment, true).')');
+                    $attachment['attachment_token'] = preg_replace('/_([-a-z0-9]+)$/i', '_'.$position_key, $token);
+                    if ($attachment['attachment_duration'] >= 99){ $attachment['attachment_duration'] = 9; }
+                    if ($this_battle->has_attachment($position_key, $attachment['attachment_token'])){ continue; }
+                        $this_battle->set_attachment($position_key, $attachment['attachment_token'], $attachment);
                         $attachments_added = true;
                     }
                 }
