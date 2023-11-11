@@ -1,0 +1,11 @@
+{
+    "skill_token": "nightmare-submodule",
+    "skill_name": "Nightmare Submodule",
+    "skill_class": "skill",
+    "skill_description": "Afflicts the active target with a weakness when face-to-face",
+    "skill_description2": "The robot afflicts the active target with a weakness to its own type when standing face-to-face.",
+    "skill_parameters": [],
+    "skill_flag_hidden": 0,
+    "skill_flag_complete": 1,
+    "skill_flag_published": 1
+}
