@@ -1,8 +1,141 @@
 {
+    "Stat-Effect Submodules": {
+        "group_class": "skill",
+        "group_token": "Stat-Effect Submodules",
+        "group_order": 0,
+        "group_child_tokens": [
+            "guard-submodule",
+            "xtreme-submodule",
+            "reverse-submodule",
+            "checkvalve-submodule",
+            "copycat-submodule"
+        ]
+    },
+    "Field-Effect Skills": {
+        "group_class": "skill",
+        "group_token": "Field-Effect Skills",
+        "group_order": 1,
+        "group_child_tokens": [
+            "bulwark-submodule",
+            "saboteur-submodule",
+            "metronome-submodule",
+            "hyperscan-submodule"
+        ]
+    },
+    "Proficiency Submodules": {
+        "group_class": "skill",
+        "group_token": "Proficiency Submodules",
+        "group_order": 2,
+        "group_child_tokens": [
+            "boost-submodule",
+            "break-submodule",
+            "tenacity-submodule",
+            "overkill-submodule"
+        ]
+    },
+    "Mechanical Submodules": {
+        "group_class": "skill",
+        "group_token": "Mechanical Submodules",
+        "group_order": 3,
+        "group_child_tokens": [
+            "target-submodule",
+            "charge-submodule"
+        ]
+    },
+    "Anti-Stat Skills": {
+        "group_class": "skill",
+        "group_token": "Anti-Stat Skills",
+        "group_order": 4,
+        "group_child_tokens": [
+            "anti-attack-submodule",
+            "anti-defense-submodule",
+            "anti-speed-submodule"
+        ]
+    },
+    "Anti-Hazard Skills": {
+        "group_class": "skill",
+        "group_token": "Anti-Hazard Skills",
+        "group_order": 5,
+        "group_child_tokens": [
+            "anti-guard-submodule",
+            "disentangle-submodule",
+            "disarmament-submodule",
+            "sanitation-submodule"
+        ]
+    },
+    "Stat-Assist Skills": {
+        "group_class": "skill",
+        "group_token": "Stat-Assist Skills",
+        "group_order": 6,
+        "group_child_tokens": [
+            "attack-assist-submodule",
+            "defense-assist-submodule",
+            "speed-assist-submodule"
+        ]
+    },
+    "Auto-Recovery Skills": {
+        "group_class": "skill",
+        "group_token": "Auto-Recovery Skills",
+        "group_order": 7,
+        "group_child_tokens": [
+            "medic-submodule",
+            "armorer-submodule",
+            "recycler-submodule",
+            "drowsing-submodule"
+        ]
+    },
+    "Stat Boost Skills": {
+        "group_class": "skill",
+        "group_token": "Stat Boost Skills",
+        "group_order": 8,
+        "group_child_tokens": [
+            "stat-boost-at-battle-start",
+            "stat-boost-at-end-of-turn",
+            "stat-boost-on-knockout",
+            "stat-boost-on-robots-nearby",
+            "stat-boost-on-cores-nearby"
+        ]
+    },
+    "Field Boost Skills": {
+        "group_class": "skill",
+        "group_token": "Field Boost Skills",
+        "group_order": 9,
+        "group_child_tokens": [
+            "field-boost-at-battle-start",
+            "field-boost-at-end-of-turn"
+        ]
+    },
+    "Farming Skills": {
+        "group_class": "skill",
+        "group_token": "Farming Skills",
+        "group_order": 10,
+        "group_child_tokens": [
+            "find-item-at-end-of-turn"
+        ]
+    },
+    "Weapon Mod Skills": {
+        "group_class": "skill",
+        "group_token": "Weapon Mod Skills",
+        "group_order": 11,
+        "group_child_tokens": [
+            "weapon-subsaver",
+            "weapon-subcharger",
+            "weapon-memory"
+        ]
+    },
+    "Elemental Subshields": {
+        "group_class": "skill",
+        "group_token": "Elemental Subshields",
+        "group_order": 12,
+        "group_child_tokens": [
+            "neutral-subshield",
+            "elemental-subshield"
+        ]
+    },
     "Elemental Subcores": {
         "group_class": "skill",
         "group_token": "Elemental Subcores",
-        "group_order": 0,
+        "group_order": 13,
         "group_child_tokens": [
             "cutter-subcore",
             "impact-subcore",
@@ -24,33 +157,12 @@
             "laser-subcore"
         ]
     },
-    "Internal Submodules": {
+    "Unsorted": {
         "group_class": "skill",
-        "group_token": "Internal Submodules",
-        "group_order": 1,
+        "group_token": "Unsorted",
+        "group_order": 14,
         "group_child_tokens": [
-            "target-submodule",
-            "charge-submodule",
-            "guard-submodule",
-            "reverse-submodule",
-            "xtreme-submodule",
-            "weapon-subsaver",
-            "boost-submodule",
-            "break-submodule",
-            "hyperscan-submodule",
-            "weapon-memory"
-        ]
-    },
-    "Dynamic Skills": {
-        "group_class": "skill",
-        "group_token": "Dynamic Skills",
-        "group_order": 2,
-        "group_child_tokens": [
-            "stat-boost-at-battle-start",
-            "stat-boost-at-end-of-turn",
-            "field-boost-at-battle-start",
-            "field-boost-at-end-of-turn",
-            "find-item-at-end-of-turn"
+            "custom-skill"
         ]
     }
 }
