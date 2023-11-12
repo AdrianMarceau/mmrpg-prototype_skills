@@ -93,4 +93,7 @@ $functions = array(
 
     }
 );
+$functions['rpg-battle_switch-in_after'] = function($objects) use ($functions){
+    return $functions['rpg-robot_check-skills_turn-start']($objects, false);
+};
 ?>
