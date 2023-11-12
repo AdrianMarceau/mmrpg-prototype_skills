@@ -83,7 +83,7 @@ $functions = array(
                 'success_frame' => 9,
                 'failure_frame' => 9,
                 'extra_text' => $trigger_text,
-                'skip_canvas_header' => false
+                'skip_canvas_header' => true
                 ));
             $this_robot->reset_frame();
 
