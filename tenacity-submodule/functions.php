@@ -68,7 +68,7 @@ $functions = array(
         $boost_type = $this_skill->skill_parameters['type'];
 
         // If this ability matches the requested type, make sure it ignores negative multipliers
-        if ((empty($this_ability->ability_type) && $this_ability->ability_type === 'none')
+        if ((empty($this_ability->ability_type) && $boost_type === 'none')
             ||(!empty($this_ability->ability_type) && $this_ability->ability_type === $boost_type)
             || (!empty($this_ability->ability_type2) && $this_ability->ability_type2 === $boost_type)){
 
@@ -90,7 +90,8 @@ $functions = array(
             // If this robot has any attachments, temporarily neutralize any would-be negative their effects
             if (!empty($this_robot->robot_attachments)){
                 foreach ($this_robot->robot_attachments AS $attachment_token => $attachment_info){
-                    if (!empty($attachment_info['attachment_damage_breaker_'.$boost_type])
+                    if (strstr($attachment_token, '_core-shield_')){ continue; }
+                    if (!empty($attachment_info['attachment_damage_output_breaker'])
                         || !empty($attachment_info['attachment_damage_output_breaker_'.$boost_type])){
                         $attachment_info['attachment_supressed'] = true;
                         $attachment_info['attachment_supressed_by_'.$this_skill->skill_token] = true;
@@ -102,7 +103,10 @@ $functions = array(
             // If the target has any attachments, temporarily neutralize any would-be negative their effects
             if (!empty($target_robot->robot_attachments)){
                 foreach ($target_robot->robot_attachments AS $attachment_token => $attachment_info){
-                    if (!empty($attachment_info['attachment_damage_breaker_'.$boost_type])
+                    if (strstr($attachment_token, '_core-shield_')){ continue; }
+                    if (!empty($attachment_info['attachment_damage_breaker'])
+                        || !empty($attachment_info['attachment_damage_input_breaker'])
+                        || !empty($attachment_info['attachment_damage_breaker_'.$boost_type])
                         || !empty($attachment_info['attachment_damage_input_breaker_'.$boost_type])){
                         $attachment_info['attachment_supressed'] = true;
                         $attachment_info['attachment_supressed_by_'.$this_skill->skill_token] = true;
