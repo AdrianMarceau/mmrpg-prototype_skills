@@ -9,6 +9,9 @@ Required:
     - stat (string: attack/defense/speed)
     - amount (integer: 1 - 5)
 
+Optional:
+    - position (string: any/active/bench)
+
 Examples:
     {"cores":"nature","stat":"attack","amount":1}
         would boost attack by one stage when a nature core is on the field
@@ -30,10 +33,22 @@ $functions = array(
         if (empty($this_skill->flags['validated'])){ return false; }
 
         // Collect parameters that have been provided and are valid
+        $boost_position = $this_skill->skill_parameters['position'];
         $boost_cores = $this_skill->skill_parameters['cores'];
         $boost_cores = !empty($boost_cores) ? explode(',', $boost_cores) : array();
         $boost_stat = $this_skill->skill_parameters['stat'];
+        $boost_stats = $boost_stat === 'all' ? array('attack', 'defense', 'speed') : array($boost_stat);
         $boost_amount = $this_skill->skill_parameters['amount'];
+
+        // If this skill only triggers in a specific position, check that now
+        //error_log('$this_skill->skill_parameters = '.print_r($this_skill->skill_parameters, true));
+        //error_log('boost_position = '.print_r($boost_position, true));
+        //error_log('this_robot->robot_position = '.print_r($this_robot->robot_position, true));
+        if (!empty($boost_position)
+            && $boost_position !== 'either'
+            && $this_robot->robot_position !== $boost_position){
+            return;
+        }
 
         // Check to see if there are any robots able to trigger this skill
         $robots_of_interest = array();
@@ -91,20 +106,22 @@ $functions = array(
         }
 
         // Ensure this robot's stat isn't already at max value
-        if ($this_robot->counters[$boost_stat.'_mods'] < MMRPG_SETTINGS_STATS_MOD_MAX){
-            // If this robot has a stat-based skill, display the trigger text separately
-            $trigger_text = $this_robot->print_name().'\'s '.$this_skill->print_name().' skill kicked in!';
-            if ($this_robot->has_item() && preg_match('/^(guard|reverse|xtreme)-module$/', $this_robot->robot_item)){
-                $this_skill->target_options_update(array('frame' => 'summon', 'success' => array(9, 0, 0, -10, $trigger_text)));
-                $this_robot->trigger_target($this_robot, $this_skill, array('prevent_default_text' => true));
-                $trigger_text = '';
+        foreach ($boost_stats AS $boost_stat){
+            if ($this_robot->counters[$boost_stat.'_mods'] < MMRPG_SETTINGS_STATS_MOD_MAX){
+                // If this robot has a stat-based skill, display the trigger text separately
+                $trigger_text = $this_robot->print_name().'\'s '.$this_skill->print_name().' skill kicked in!';
+                if ($this_robot->has_item() && preg_match('/^(guard|reverse|xtreme)-module$/', $this_robot->robot_item)){
+                    $this_skill->target_options_update(array('frame' => 'summon', 'success' => array(9, 0, 0, -10, $trigger_text)));
+                    $this_robot->trigger_target($this_robot, $this_skill, array('prevent_default_text' => true));
+                    $trigger_text = '';
+                }
+                // Call the global stat boost function with customized options
+                rpg_ability::ability_function_stat_boost($this_robot, $boost_stat, $boost_amount, $this_skill, array(
+                    'success_frame' => 9,
+                    'failure_frame' => 9,
+                    'extra_text' => $trigger_text
+                    ));
             }
-            // Call the global stat boost function with customized options
-            rpg_ability::ability_function_stat_boost($this_robot, $boost_stat, $boost_amount, $this_skill, array(
-                'success_frame' => 9,
-                'failure_frame' => 9,
-                'extra_text' => $trigger_text
-                ));
         }
 
         // Return true on success
@@ -133,7 +150,7 @@ $functions = array(
         }
 
         // Validate the "stat" parameter has been set to a valid value
-        $allowed_stats = array('attack', 'defense', 'speed');
+        $allowed_stats = array('attack', 'defense', 'speed', 'all');
         if (!isset($this_skill->skill_parameters['stat'])
             || !in_array($this_skill->skill_parameters['stat'], $allowed_stats)){
             error_log('skill parameter "stat" was not set or was invalid ('.$this_skill->skill_token.':'.__LINE__.')');
@@ -159,6 +176,21 @@ $functions = array(
             $this_skill->skill_parameters['amount'] = intval($this_skill->skill_parameters['amount']);
         }
 
+        // Validate the "position" parameter has been set to a valid value
+        $allowed_positions = array('', 'either', 'active', 'bench');
+        if (isset($this_skill->skill_parameters['position'])
+            && !in_array($this_skill->skill_parameters['position'], $allowed_positions)){
+            error_log('skill parameter "position" was not set or was invalid ('.$this_skill->skill_token.':'.__LINE__.')');
+            if (isset($this_skill->skill_parameters['position'])){
+                error_log('position = '.print_r($this_skill->skill_parameters['position'], true));
+            }
+            $this_skill->set_flag('validated', false);
+            return false;
+        } elseif (!isset($this_skill->skill_parameters['position'])){
+            // Otherwise make sure this at least exists in a proper string
+            $this_skill->skill_parameters['position'] = $allowed_positions[0];
+        }
+
         // Everything is fine so let's return true
         return true;
 
@@ -168,6 +200,9 @@ $functions['rpg-robot_check-skills_battle-start'] = function($objects) use ($fun
     return $functions['robot_function_on-cores-nearby']($objects, true);
 };
 $functions['rpg-robot_check-skills_turn-start'] = function($objects) use ($functions){
+    return $functions['robot_function_on-cores-nearby']($objects, true);
+};
+$functions['rpg-robot_check-skills_end-of-turn'] = function($objects) use ($functions){
     return $functions['robot_function_on-cores-nearby']($objects, true);
 };
 ?>
