@@ -1,0 +1,11 @@
+{
+    "skill_token": "persist-submodule",
+    "skill_name": "Persist Submodule",
+    "skill_class": "skill",
+    "skill_description": "Survives one-hit knockouts with a sliver of energy remaining",
+    "skill_description2": "The robot can survive one-hit knockouts from opponents' attacks but only when at full life energy.",
+    "skill_parameters": [],
+    "skill_flag_hidden": 0,
+    "skill_flag_complete": 1,
+    "skill_flag_published": 1
+}
