@@ -1,0 +1,11 @@
+{
+    "skill_token": "transport-submodule",
+    "skill_name": "Transport Submodule",
+    "skill_class": "skill",
+    "skill_description": "Allows other robots to switch freely when this one's on the bench",
+    "skill_description2": "The robot allows teammates to switch freely to and from active position but only when this robot is on the bench.",
+    "skill_parameters": [],
+    "skill_flag_hidden": 0,
+    "skill_flag_complete": 1,
+    "skill_flag_published": 1
+}
