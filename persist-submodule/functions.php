@@ -33,16 +33,16 @@ $functions = array(
         return true;
 
     },
-    'rpg-ability_trigger-damage_after' => function($objects){
-        //error_log('rpg-ability_trigger-damage_after() for '.$objects['this_robot']->robot_string.'//'.$objects['this_skill']->skill_token);
+    'rpg-robot_trigger-disabled_before' => function($objects){
+        //error_log('rpg-robot_trigger-disabled_before() for '.$objects['this_robot']->robot_string.'//'.$objects['this_skill']->skill_token);
 
         // Extract objects into the global scope
         extract($objects);
 
         // If this robot is not the recipient, the skill doesn't activate
-        if ($options->damage_target !== $this_robot){ return false; }
-        //if (empty($options->damage_target)){ return false; }
-        //$target_robot = $options->damage_target;
+        if ($options->disabled_target !== $this_robot){ return false; }
+        //if (empty($options->disabled_target)){ return false; }
+        //$target_robot = $options->disabled_target;
         //error_log('$this_robot->robot_energy: '.print_r($this_robot->robot_energy, true));
         //error_log('$this_robot->robot_status: '.print_r($this_robot->robot_status, true));
 
@@ -83,6 +83,10 @@ $functions = array(
             );
         $this_robot->reset_frame();
 
+        // Make sure we return early so it doesn't actually disable
+        //error_log('$options->return_early = '.($options->return_early ? 'true' : 'false'));
+        $options->return_early = true;
+        //error_log('$options->return_early = '.($options->return_early ? 'true' : 'false'));
 
         // Return true on success
         return true;
