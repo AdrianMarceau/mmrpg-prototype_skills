@@ -79,4 +79,7 @@ $functions['rpg-robot_check-skills_battle-start'] = function($objects) use ($fun
 $functions['rpg-robot_check-skills_turn-start'] = function($objects) use ($functions){
     return $functions['rpg-robot_check-skills_update-bulwarks']($objects, true);
 };
+$functions['rpg-battle_switch-in_after'] = function($objects) use ($functions){
+    return $functions['rpg-robot_check-skills_update-bulwarks']($objects, false);
+};
 ?>
