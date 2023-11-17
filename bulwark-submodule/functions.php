@@ -10,7 +10,10 @@ $functions = array(
 
         // Check to see if this robot's skill is currently active
         $skill_is_active = false;
-        if ($this_robot->robot_position === 'active'){ $skill_is_active = true; }
+        if ($this_robot->robot_status !== 'disabled'
+            && $this_robot->robot_position === 'active'){
+            $skill_is_active = true;
+        }
 
         // Turn ON the priority-blocking feature of this skill
         // by adding this robot's ID to the player's bulwark list
