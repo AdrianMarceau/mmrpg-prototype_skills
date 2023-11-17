@@ -30,7 +30,8 @@ $functions = array(
         if (!$skill_is_active){ return false; }
 
         // Print a message showing that this effect is taking place
-        if ($transport_added){
+        if ($transport_added
+            && empty($this_robot->flags['skill_effect_shown'])){
             $this_robot->set_frame('taunt');
             $this_battle->queue_sound_effect('hyper-stomp-sound');
             $this_battle->events_create($this_robot, false, $this_robot->robot_name.'\'s '.$this_skill->skill_name,
@@ -47,6 +48,15 @@ $functions = array(
                     )
                 );
             $this_robot->reset_frame();
+            $this_battle->events_create($this_robot, false, '', '',
+                array(
+                    'event_flag_camera_action' => true,
+                    'event_flag_camera_side' => $this_robot->player->player_side,
+                    'event_flag_camera_focus' => $this_robot->robot_position,
+                    'event_flag_camera_depth' => $this_robot->robot_key
+                    )
+                );
+            $this_robot->set_flag('skill_effect_shown', true);
         }
 
         // Return true on success
@@ -80,6 +90,9 @@ $functions['rpg-robot_check-skills_turn-start'] = function($objects) use ($funct
     return $functions['rpg-robot_check-skills_update-transports']($objects, true);
 };
 $functions['rpg-battle_switch-in_after'] = function($objects) use ($functions){
+    return $functions['rpg-robot_check-skills_update-transports']($objects, false);
+};
+$functions['rpg-battle_switch-out_after'] = function($objects) use ($functions){
     return $functions['rpg-robot_check-skills_update-transports']($objects, false);
 };
 ?>
