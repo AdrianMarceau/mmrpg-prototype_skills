@@ -35,7 +35,7 @@ $functions = array(
             $this_battle->queue_sound_effect('hyper-stomp-sound');
             $this_battle->events_create($this_robot, false, $this_robot->robot_name.'\'s '.$this_skill->skill_name,
                 $this_robot->print_name().'\'s '.$this_skill->print_name().' skill kicked in!<br />'.
-                'Benched robots can\'t be targeted as long as '.$this_robot->get_pronoun('subject').' remains active!',
+                'Benched robots can\'t be targeted as long as '.$this_robot->print_name().' remains active!',
                 array(
                     'this_skill' => $this_skill,
                     'canvas_show_this_skill_overlay' => false,
