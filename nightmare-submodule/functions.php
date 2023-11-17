@@ -87,6 +87,14 @@ $functions = array(
                 )
             );
         $target_robot->reset_frame();
+        $this_battle->events_create($target_robot, false, '', '',
+            array(
+                'event_flag_camera_action' => true,
+                'event_flag_camera_side' => $target_robot->player->player_side,
+                'event_flag_camera_focus' => $target_robot->robot_position,
+                'event_flag_camera_depth' => $target_robot->robot_key
+                )
+            );
 
         // Return true on success
         return true;
