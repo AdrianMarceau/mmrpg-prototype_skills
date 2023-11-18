@@ -1,0 +1,11 @@
+{
+    "skill_token": "construction-submodule",
+    "skill_name": "Construction Submodule",
+    "skill_class": "skill",
+    "skill_description": "Protects itself with Super Blocks at the end of each turn",
+    "skill_description2": "The robot places a Super Block at its current position at the end of any turn it is not already protected by one.",
+    "skill_parameters": [],
+    "skill_flag_hidden": 0,
+    "skill_flag_complete": 1,
+    "skill_flag_published": 1
+}
