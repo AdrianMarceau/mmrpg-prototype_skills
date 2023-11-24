@@ -50,6 +50,22 @@ $functions = array(
         $target_base_weaknesses[] = $this_core_type;
         $target_robot->set_base_weaknesses($target_base_weaknesses);
 
+        // If the robot has this type an an immunity, we should remove it
+        $target_immunities = $target_robot->get_base_immunities();
+        if (in_array($this_core_type, $target_immunities)){
+            $target_immunities = array_diff($target_immunities, array($this_core_type));
+            $target_robot->set_immunities($target_immunities);
+            $target_robot->set_base_immunities($target_immunities);
+            }
+
+        // If the robot has this type as a resistance, we should remove it
+        $target_resistances = $target_robot->get_resistances();
+        if (in_array($this_core_type, $target_resistances)){
+            $target_resistances = array_diff($target_resistances, array($this_core_type));
+            $target_robot->set_resistances($target_resistances);
+            $target_robot->set_base_resistances($target_resistances);
+            }
+
         // Print a message showing that this effect is taking place
         $subject_pretext = $this_robot->get_pronoun('subject');
         $subject_pretext .= ($subject_pretext === 'they' ? '\'re' : '\'s');
