@@ -33,44 +33,66 @@ $functions = array(
         return true;
 
     },
-    'rpg-robot_trigger-disabled_before' => function($objects){
-        //error_log('rpg-robot_trigger-disabled_before() for '.$objects['this_robot']->robot_string.'//'.$objects['this_skill']->skill_token);
+    'rpg-ability_trigger-damage_pre-damage' => function($objects){
+        //error_log('rpg-ability_trigger-damage_pre-damage() for '.$objects['this_robot']->robot_string.'//'.$objects['this_skill']->skill_token);
 
         // Extract objects into the global scope
         extract($objects);
 
         // If this robot is not the recipient, the skill doesn't activate
-        if ($options->disabled_target !== $this_robot){ return false; }
-        //if (empty($options->disabled_target)){ return false; }
-        //$target_robot = $options->disabled_target;
-        //error_log('$this_robot->robot_energy: '.print_r($this_robot->robot_energy, true));
+        if ($options->damage_target !== $this_robot){ return false; }
+        //error_log('$this_robot->robot_string = '.print_r($this_robot->robot_string, true));
         //error_log('$this_robot->robot_status: '.print_r($this_robot->robot_status, true));
+        //error_log('$this_robot->robot_energy = '.print_r($this_robot->robot_energy, true));
+        //error_log('$this_robot->robot_base_energy = '.print_r($this_robot->robot_base_energy, true));
+        //error_log('$this_ability->ability_results[\'this_amount\'] = '.print_r($this_ability->ability_results['this_amount'], true));
 
         // Check to see if this robot had full health before the damage
         $full_health_before_damage = $this_robot->get_flag('full_health_before_damage');
         //error_log('full_health_before_damage: '.($full_health_before_damage ? 'true' : 'false'));
+        $this_robot->set_flag('full_health_before_damage', false);
 
         // Check to see if this robot is now at zero energy and thus would be disabled
-        $zero_health_after_damage = $this_robot->robot_energy <= 0 ? true : false;
+        $calculated_damage_amount = $this_ability->ability_results['this_amount'];
+        $health_after_damage = $this_robot->robot_energy - $calculated_damage_amount;
+        $zero_health_after_damage = $health_after_damage <= 0 ? true : false;
+        //error_log('$calculated_damage_amount: '.print_r($calculated_damage_amount, true));
+        //error_log('$health_after_damage: '.print_r($health_after_damage, true));
         //error_log('$zero_health_after_damage: '.($zero_health_after_damage ? 'true' : 'false'));
 
         // Check to see if this was a legit OHKO from full health otherwise the skill doesn't activate
-        $this_robot->set_flag('full_health_before_damage', false);
         if (!$full_health_before_damage || !$zero_health_after_damage){ return false; }
 
-        // Revive this robot with the appropriate energy and remove any flags
-        $this_robot->set_energy(1);
-        $this_robot->set_status('active');
-        $this_robot->unset_flag('apply_disabled_state');
-        $this_robot->unset_flag('hidden');
-        $this_robot->unset_attachment('object_defeat-explosion');
+        // Otherwise, reduce the damage to until only 1 energy would remain
+        $this_ability->ability_results['this_amount'] = $this_robot->robot_energy - 1;
+        //error_log('NEW $this_ability->ability_results[\'this_amount\'] = '.print_r($this_ability->ability_results['this_amount'], true));
+
+        // Display a message showing this robot's skill is in effect
+        $this_robot->set_flag('persist_submodule_triggered', true);
+
+        // Return true on success
+        return true;
+
+    },
+    'rpg-ability_trigger-damage_after' => function($objects){
+        //error_log('rpg-ability_trigger-damage_pre-damage() for '.$objects['this_robot']->robot_string.'//'.$objects['this_skill']->skill_token);
+
+        // Extract objects into the global scope
+        extract($objects);
+
+        // If this robot is not the recipient, the skill doesn't activate
+        if ($options->damage_target !== $this_robot){ return false; }
+
+        // If there is no message to display, we can return early
+        if (empty($this_robot->get_flag('persist_submodule_triggered'))){ return false; }
+        $this_robot->unset_flag('persist_submodule_triggered');
 
         // Display a message showing this robot's skill is in effect
         $this_robot->set_frame('taunt');
         $this_battle->queue_sound_effect('use-recovery-item');
         $this_battle->events_create($this_robot, false, $this_robot->robot_name.'\'s '.$this_skill->skill_name,
             $this_robot->print_name().'\'s '.$this_skill->print_name().' skill kicked in!<br />'.
-            ucfirst($this_robot->get_pronoun('subject')).' survived the attack and restored '.$this_robot->get_pronoun('possessive2').' data!',
+            'The skill protects '.$this_robot->get_pronoun('object').' from being disabled by a OHKO!',
             array(
                 'this_skill' => $this_skill,
                 'canvas_show_this_skill_overlay' => false,
@@ -82,11 +104,6 @@ $functions = array(
                 )
             );
         $this_robot->reset_frame();
-
-        // Make sure we return early so it doesn't actually disable
-        //error_log('$options->return_early = '.($options->return_early ? 'true' : 'false'));
-        $options->return_early = true;
-        //error_log('$options->return_early = '.($options->return_early ? 'true' : 'false'));
 
         // Return true on success
         return true;
