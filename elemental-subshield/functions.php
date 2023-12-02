@@ -46,13 +46,18 @@ $functions = array(
 
     },
     'rpg-ability_trigger-damage_before' => function($objects){
-        //error_log('rpg-ability_trigger-damage_before() by '.$objects['this_robot']->robot_string.' from '.$objects['this_ability']->ability_token);
+        //error_log('rpg-ability_trigger-damage_before() by '.$objects['options']->damage_initiator->robot_string.' w/ '.$objects['this_ability']->ability_token);
 
         // Extract all objects into the current scope
         extract($objects);
+        //error_log('$this_robot->robot_string = '.$this_robot->robot_string);
+        //error_log('$target_robot->robot_string = '.$target_robot->robot_string);
+        //error_log('$options->damage_initiator->robot_string = '.$options->damage_initiator->robot_string);
+        //error_log('$options->damage_target->robot_string = '.$options->damage_target->robot_string);
 
         // If the ability being used is not by this robot, it's not relevant
-        if ($this_ability->robot === $this_robot){ return false; }
+        if ($options->damage_target !== $this_robot){ return false; }
+        //error_log('WE ARE THE TARGET!  Check if we should block damage...');
 
         // If the damage is going to be shielded, make sure we display the skill name
         if (!empty($this_ability->ability_type)
