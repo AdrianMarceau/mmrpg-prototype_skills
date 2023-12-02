@@ -66,6 +66,14 @@ $functions = array(
             $target_robot->set_base_resistances($target_resistances);
             }
 
+        // If the robot has this type as an affinity, we should remove it
+        $target_affinities = $target_robot->get_affinities();
+        if (in_array($this_core_type, $target_affinities)){
+            $target_affinities = array_diff($target_affinities, array($this_core_type));
+            $target_robot->set_affinities($target_affinities);
+            $target_robot->set_base_affinities($target_affinities);
+            }
+
         // Print a message showing that this effect is taking place
         $subject_pretext = $this_robot->get_pronoun('subject');
         $subject_pretext .= ($subject_pretext === 'they' ? '\'re' : '\'s');
