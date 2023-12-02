@@ -52,14 +52,21 @@ $functions = array(
 
     },
     'rpg-ability_trigger-damage_before' => function($objects){
+        //error_log('rpg-ability_trigger-damage_before() by '.$objects['options']->damage_initiator->robot_string.' w/ '.$objects['this_ability']->ability_token);
 
-        // Extract objects into the global scope
+        // Extract all objects into the current scope
         extract($objects);
+        //error_log('$this_robot->robot_string = '.$this_robot->robot_string);
+        //error_log('$target_robot->robot_string = '.$target_robot->robot_string);
+        //error_log('$options->damage_initiator->robot_string = '.$options->damage_initiator->robot_string);
+        //error_log('$options->damage_target->robot_string = '.$options->damage_target->robot_string);
 
         // If this robot is the aggressor, the skill doesn't activate
         if ($options->damage_initiator !== $this_robot){ return false; }
-        if (empty($options->damage_target)){ return false; }
-        $target_robot = $options->damage_target;
+        //error_log('WE ARE THE TARGET!  Check if we should block damage...');
+
+        // Extract objects into the global scope
+        extract($objects);
 
         // If this skill was not validated we cannot proceed
         if (empty($this_skill->flags['validated'])){ return false; }
