@@ -19,7 +19,8 @@
             "boost-submodule",
             "break-submodule",
             "tenacity-submodule",
-            "overkill-submodule"
+            "overkill-submodule",
+            "siphon-submodule"
         ]
     },
     "Mechanical Submodules": {
