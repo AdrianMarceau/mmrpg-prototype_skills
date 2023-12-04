@@ -1,0 +1,11 @@
+{
+    "skill_token": "siphon-submodule",
+    "skill_name": "Siphon Submodule",
+    "skill_class": "skill",
+    "skill_description": "Steals weapon energy from the target when dealing damage",
+    "skill_description2": "The robot steals a bit of weapon energy from the target whenever they successfully deal damage using an ability.",
+    "skill_parameters": [],
+    "skill_flag_hidden": 0,
+    "skill_flag_complete": 1,
+    "skill_flag_published": 1
+}
