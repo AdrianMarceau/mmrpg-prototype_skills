@@ -27,40 +27,55 @@ $functions = array(
         // If this skill was not validated we cannot proceed
         if (empty($this_skill->flags['validated'])){ return false; }
 
+        // Check to see if this robot's skill is currently active
+        $skill_is_active = false;
+        if ($this_robot->robot_status !== 'disabled'){ $skill_is_active = true; }
+
         // Collect parameters that have been provided and are valid
         $wellspring_type = $this_skill->skill_parameters['type'];
 
         // Turn ON the weapon-wellspring feature of this skill
         // by adding this robot's ID to the player's weapon_wellspring list
+        $weapon_wellspring_added = false;
         $weapon_wellspring_token = $wellspring_type.'_wellspring_robots';
         $weapon_wellspring_robots = $this_player->get_value($weapon_wellspring_token);
         if (empty($weapon_wellspring_robots)){ $weapon_wellspring_robots = array(); }
-        if (!in_array($this_robot->robot_id, $weapon_wellspring_robots)){ $weapon_wellspring_robots[] = $this_robot->robot_id; }
+        if ($skill_is_active && !in_array($this_robot->robot_id, $weapon_wellspring_robots)){
+            $weapon_wellspring_robots[] = $this_robot->robot_id;
+            $weapon_wellspring_added = true;
+        } elseif (!$skill_is_active && in_array($this_robot->robot_id, $weapon_wellspring_robots)){
+            $weapon_wellspring_robots = array_diff($weapon_wellspring_robots, array($this_robot->robot_id));
+        }
         $this_player->set_value($weapon_wellspring_token, $weapon_wellspring_robots);
 
+        // If the skill isn't active don't show anthing
+        if (!$skill_is_active){ return false; }
+
         // Print a message showing that this effect is taking place
-        $pronoun_subject = $this_robot->get_pronoun('subject');
-        $pronoun_possessive2 = $this_robot->get_pronoun('possessive2');
-        $this_robot->set_frame('taunt');
-        $this_battle->queue_sound_effect('scan-start');
-        $this_battle->events_create($this_robot, false, $this_robot->robot_name.'\'s '.$this_skill->skill_name,
-            $this_robot->print_name().'\'s '.$this_skill->print_name().' skill kicked in!<br />'.
-            ucfirst($pronoun_possessive2).' team\'s '.
-            rpg_type::print_span($this_robot->robot_core).'-type abilities '.
-            'cost only '.rpg_type::print_span('weapons', '1 WE').' while '.
-            ($pronoun_subject === 'they' ? $pronoun_subject.'\'re ' : $pronoun_subject.'\'s ').
-            'active!',
-            array(
-                'this_skill' => $this_skill,
-                'canvas_show_this_skill_overlay' => false,
-                'canvas_show_this_skill_underlay' => true,
-                'event_flag_camera_action' => true,
-                'event_flag_camera_side' => $this_robot->player->player_side,
-                'event_flag_camera_focus' => $this_robot->robot_position,
-                'event_flag_camera_depth' => $this_robot->robot_key
-                )
-            );
-        $this_robot->reset_frame();
+        if ($weapon_wellspring_added){
+            $pronoun_subject = $this_robot->get_pronoun('subject');
+            $pronoun_possessive2 = $this_robot->get_pronoun('possessive2');
+            $this_robot->set_frame('taunt');
+            $this_battle->queue_sound_effect('summon-positive');
+            $this_battle->events_create($this_robot, false, $this_robot->robot_name.'\'s '.$this_skill->skill_name,
+                $this_robot->print_name().'\'s '.$this_skill->print_name().' skill kicked in!<br />'.
+                ucfirst($pronoun_possessive2).' team\'s '.
+                rpg_type::print_span($wellspring_type).'-type abilities '.
+                'cost only '.rpg_type::print_span('weapons', '1 WE').' while '.
+                ($pronoun_subject === 'they' ? $pronoun_subject.'\'re ' : $pronoun_subject.'\'s ').
+                'active!',
+                array(
+                    'this_skill' => $this_skill,
+                    'canvas_show_this_skill_overlay' => false,
+                    'canvas_show_this_skill_underlay' => true,
+                    'event_flag_camera_action' => true,
+                    'event_flag_camera_side' => $this_robot->player->player_side,
+                    'event_flag_camera_focus' => $this_robot->robot_position,
+                    'event_flag_camera_depth' => $this_robot->robot_key
+                    )
+                );
+            $this_robot->reset_frame();
+        }
 
         // Return true on success
         return true;
