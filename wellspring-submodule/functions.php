@@ -63,7 +63,7 @@ $functions = array(
                 rpg_type::print_span($wellspring_type).'-type abilities '.
                 'cost only '.rpg_type::print_span('weapons', '1 WE').' while '.
                 ($pronoun_subject === 'they' ? $pronoun_subject.'\'re ' : $pronoun_subject.'\'s ').
-                'active!',
+                'on the field!',
                 array(
                     'this_skill' => $this_skill,
                     'canvas_show_this_skill_overlay' => false,
