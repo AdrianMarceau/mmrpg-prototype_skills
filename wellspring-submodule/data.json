@@ -1,0 +1,11 @@
+{
+    "skill_token": "wellspring-submodule",
+    "skill_name": "Wellspring Submodule",
+    "skill_class": "skill",
+    "skill_description": "Reduces the cost of abilities matching the user's core to only one unit",
+    "skill_description2": "The robot's wellspring of elemental energy reduces the cost of abilities matching their own core type for everyone on the team.",
+    "skill_parameters": [],
+    "skill_flag_hidden": 0,
+    "skill_flag_complete": 1,
+    "skill_flag_published": 1
+}
