@@ -3,7 +3,7 @@ $functions = array(
     'skill_function' => function($objects){
         return true;
     },
-    'rpg-robot_check-skills_battle-start' => function($objects){
+    'rpg-robot_check-skills_update-saboteurs' => function($objects){
 
         // Extract all objects into the current scope
         extract($objects);
@@ -57,4 +57,13 @@ $functions = array(
 
     },
 );
+$functions['rpg-robot_check-skills_battle-start'] = function($objects) use ($functions){
+    return $functions['rpg-robot_check-skills_update-saboteurs']($objects, true);
+};
+$functions['rpg-robot_check-skills_turn-start'] = function($objects) use ($functions){
+    return $functions['rpg-robot_check-skills_update-saboteurs']($objects, true);
+};
+$functions['rpg-battle_switch-in_after'] = function($objects) use ($functions){
+    return $functions['rpg-robot_check-skills_update-saboteurs']($objects, false);
+};
 ?>
