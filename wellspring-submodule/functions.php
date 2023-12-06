@@ -1,4 +1,20 @@
 <?
+/*
+==================================================
+
+THIS SKILL HAS PARAMETERS!
+
+Required:
+    - type (string: cutter/impact/freeze/etc.)
+
+Examples:
+    {"type":"nature"}
+        would allow Nature-type abilities to be used at reduced cost
+    {"type":"flame"}
+        would allow Flame-type abilities to be used at reduced cost
+
+==================================================
+*/
 $functions = array(
     'skill_function' => function($objects){
         return true;
@@ -8,12 +24,15 @@ $functions = array(
         // Extract all objects into the current scope
         extract($objects);
 
-        // If this robot has no core type, the skill does nothing
-        if (empty($this_robot->robot_core)){ return false; }
+        // If this skill was not validated we cannot proceed
+        if (empty($this_skill->flags['validated'])){ return false; }
+
+        // Collect parameters that have been provided and are valid
+        $wellspring_type = $this_skill->skill_parameters['type'];
 
         // Turn ON the weapon-wellspring feature of this skill
         // by adding this robot's ID to the player's weapon_wellspring list
-        $weapon_wellspring_token = $this_robot->robot_core.'_wellspring_robots';
+        $weapon_wellspring_token = $wellspring_type.'_wellspring_robots';
         $weapon_wellspring_robots = $this_player->get_value($weapon_wellspring_token);
         if (empty($weapon_wellspring_robots)){ $weapon_wellspring_robots = array(); }
         if (!in_array($this_robot->robot_id, $weapon_wellspring_robots)){ $weapon_wellspring_robots[] = $this_robot->robot_id; }
@@ -70,6 +89,30 @@ $functions = array(
         return true;
 
     },
+    'skill_function_onload' => function($objects){
+
+        // Extract objects into the global scope
+        extract($objects);
+
+        // Default to this skill being validated and go from there
+        $this_skill->set_flag('validated', true);
+
+        // Validate the "type" parameter has been set to a valid value
+        $allowed_types = array_keys(rpg_type::get_index(false, false, false, false));
+        if (!isset($this_skill->skill_parameters['type'])
+            || !in_array($this_skill->skill_parameters['type'], $allowed_types)){
+            error_log('skill parameter "type" was not set or was invalid ('.$this_skill->skill_token.':'.__LINE__.')');
+            if (isset($this_skill->skill_parameters['type'])){
+                error_log('type = '.print_r($this_skill->skill_parameters['type'], true));
+            }
+            $this_skill->set_flag('validated', false);
+            return false;
+        }
+
+        // Everything is fine so let's return true
+        return true;
+
+    }
 );
 $functions['rpg-robot_check-skills_battle-start'] = function($objects) use ($functions){
     return $functions['rpg-robot_check-skills_update-wellsprings']($objects, true);
