@@ -63,6 +63,26 @@ $functions = array(
         // Return true on success
         return true;
 
+    },
+    'rpg-skill_disable-skill_before' => function($objects){
+        //error_log('rpg-skill_disable-skill_before() for '.$objects['this_robot']->robot_string);
+
+        // Extract all objects into the current scope
+        extract($objects);
+
+        // Turn OFF the heal-blocking feature of this skill by removing it from the list
+        $hyperscan_removed = false;
+        $hyperscan_robots = $this_player->get_value('hyperscan_robots');
+        if (empty($hyperscan_robots)){ $hyperscan_robots = array(); }
+        if (in_array($this_robot->robot_id, $hyperscan_robots)){
+            $hyperscan_robots = array_diff($hyperscan_robots, array($this_robot->robot_id));
+            $hyperscan_removed = true;
+        }
+        $this_player->set_value('hyperscan_robots', $hyperscan_robots);
+
+        // Return true on success
+        return true;
+
     }
 );
 $functions['rpg-robot_check-skills_turn-start'] = function($objects) use ($functions){
