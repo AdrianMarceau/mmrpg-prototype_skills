@@ -52,7 +52,9 @@ $functions = array(
         if (!$skill_is_active){ return false; }
 
         // Print a message showing that this effect is taking place
-        if ($weapon_wellspring_added){
+        $flag = 'skill-event-shown_'.$this_skill->skill_token;
+        if ($weapon_wellspring_added
+            && empty($this_robot->get_flag($flag))){
             $pronoun_subject = $this_robot->get_pronoun('subject');
             $pronoun_possessive2 = $this_robot->get_pronoun('possessive2');
             $this_robot->set_frame('taunt');
@@ -75,6 +77,7 @@ $functions = array(
                     )
                 );
             $this_robot->reset_frame();
+            $this_robot->set_flag($flag, true);
         }
 
         // Return true on success
@@ -125,6 +128,30 @@ $functions = array(
         }
 
         // Everything is fine so let's return true
+        return true;
+
+    },
+    'rpg-skill_disable-skill_before' => function($objects){
+        //error_log('rpg-skill_disable-skill_before() for '.$objects['this_robot']->robot_string);
+
+        // Extract all objects into the current scope
+        extract($objects);
+
+        // If this robot has no core type, the skill does nothing
+        if (empty($this_robot->robot_core)){ return false; }
+
+        // Turn OFF the heal-blocking feature of this skill by removing it from the list
+        $wellspring_removed = false;
+        $weapon_wellspring_token = $this_robot->robot_core.'_wellspring_robots';
+        $weapon_wellspring_robots = $this_player->get_value($weapon_wellspring_token);
+        if (empty($weapon_wellspring_robots)){ $weapon_wellspring_robots = array(); }
+        if (in_array($this_robot->robot_id, $weapon_wellspring_robots)){
+            $weapon_wellspring_robots = array_diff($weapon_wellspring_robots, array($this_robot->robot_id));
+            $wellspring_removed = true;
+        }
+        $this_player->set_value($weapon_wellspring_token, $weapon_wellspring_robots);
+
+        // Return true on success
         return true;
 
     }
