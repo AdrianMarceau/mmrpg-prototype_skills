@@ -15,7 +15,7 @@ $functions = array(
             $skill_is_active = true;
         }
 
-        // Turn ON the priority-blocking feature of this skill
+        // Turn ON the free-switching feature of this skill
         // by adding this robot's ID to the player's transport list
         // and turn it OFF by removing it from the list
         $transport_added = false;
@@ -74,7 +74,7 @@ $functions = array(
         // If this robot is not the target, then we can return early
         if ($this_robot !== $options->disabled_target){ return false; }
 
-        // Turn OFF the priority-blocking feature of this skill
+        // Turn OFF the free-switching feature of this skill
         // by removing this robot's ID to the player's transport list
         $transport_robots = $this_player->get_value('transport_robots');
         if (empty($transport_robots)){ $transport_robots = array(); }
@@ -85,6 +85,26 @@ $functions = array(
         return true;
 
     },
+    'rpg-skill_disable-skill_before' => function($objects){
+        //error_log('rpg-skill_disable-skill_before() for '.$objects['this_robot']->robot_string);
+
+        // Extract all objects into the current scope
+        extract($objects);
+
+        // Turn OFF the free-switching feature of this skill by removing it from the list
+        $transport_removed = false;
+        $transport_robots = $this_player->get_value('transport_robots');
+        if (empty($transport_robots)){ $transport_robots = array(); }
+        if (in_array($this_robot->robot_id, $transport_robots)){
+            $transport_robots = array_diff($transport_robots, array($this_robot->robot_id));
+            $transport_removed = true;
+        }
+        $this_player->set_value('transport_robots', $transport_robots);
+
+        // Return true on success
+        return true;
+
+    }
 );
 $functions['rpg-robot_check-skills_battle-start'] = function($objects) use ($functions){
     return $functions['rpg-robot_check-skills_update-transports']($objects, true);
