@@ -75,6 +75,26 @@ $functions = array(
         return true;
 
     },
+    'rpg-skill_disable-skill_before' => function($objects){
+        //error_log('rpg-skill_disable-skill_before() for '.$objects['this_robot']->robot_string);
+
+        // Extract all objects into the current scope
+        extract($objects);
+
+        // Turn OFF the bench-blocking feature of this skill by removing it from the list
+        $bulwark_removed = false;
+        $bulwark_robots = $this_player->get_value('bulwark_robots');
+        if (empty($bulwark_robots)){ $bulwark_robots = array(); }
+        if (in_array($this_robot->robot_id, $bulwark_robots)){
+            $bulwark_robots = array_diff($bulwark_robots, array($this_robot->robot_id));
+            $bulwark_removed = true;
+        }
+        $this_player->set_value('bulwark_robots', $bulwark_robots);
+
+        // Return true on success
+        return true;
+
+    }
 );
 $functions['rpg-robot_check-skills_battle-start'] = function($objects) use ($functions){
     return $functions['rpg-robot_check-skills_update-bulwarks']($objects, true);
