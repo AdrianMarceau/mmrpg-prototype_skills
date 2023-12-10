@@ -15,10 +15,10 @@ $functions = array(
         extract($objects);
 
         // Define a flag to hold whether or not we removed anything
-        $explosive_objects_removed = 0;
+        $hazard_objects_removed = 0;
 
         // Define the list of explosive attachments/hazards that this skill removes
-        $explosive_object_tokens = array(
+        $hazard_object_tokens = array(
             'oil-shooter_crude-oil',
             'bubble-spray_foamy-bubbles',
             'ice-breath_frozen-foothold',
@@ -49,7 +49,7 @@ $functions = array(
                 foreach ($battle_attachments AS $attachment_token => $attachment_info){
                     $attachment_token_clean = preg_replace($attachment_token_regex, '$1', $attachment_token);
                     $attachment_token_context = preg_replace($attachment_token_regex, '$2', $attachment_token);
-                    if (!in_array($attachment_token_clean, $explosive_object_tokens)){ continue; }
+                    if (!in_array($attachment_token_clean, $hazard_object_tokens)){ continue; }
                     $attachment_fx_token = false;
                     if (isset($object_fx_tokens[$attachment_token_clean])){
                         $attachment_fx_token = str_replace(
@@ -96,7 +96,7 @@ $functions = array(
                 if (!empty($robot->robot_attachments)){
                     foreach ($robot->robot_attachments AS $attachment_token => $attachment_info){
                         $attachment_token_clean = preg_replace('/^ability_([-_a-z0-9]+)$/', '$1', $attachment_token);
-                        if (!in_array($attachment_token_clean, $explosive_object_tokens)){ continue; }
+                        if (!in_array($attachment_token_clean, $hazard_object_tokens)){ continue; }
                         $attachment_fx_token = false;
                         if (isset($object_fx_tokens[$attachment_token_clean])){
                             $attachment_fx_token = str_replace(
