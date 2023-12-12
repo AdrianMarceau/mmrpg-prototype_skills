@@ -108,6 +108,9 @@ $functions = array(
             if ($new_multiplier_value >= MMRPG_SETTINGS_MULTIPLIER_MAX){
                 $temp_change_percent = $new_multiplier_value - MMRPG_SETTINGS_MULTIPLIER_MAX;
                 $new_multiplier_value = MMRPG_SETTINGS_MULTIPLIER_MAX;
+            } elseif ($new_multiplier_value <= MMRPG_SETTINGS_MULTIPLIER_MIN){
+                $temp_change_percent = $new_multiplier_value - MMRPG_SETTINGS_MULTIPLIER_MIN;
+                $new_multiplier_value = MMRPG_SETTINGS_MULTIPLIER_MIN;
             }
             $this_field->set_multiplier($boost_type, $new_multiplier_value);
 
@@ -171,7 +174,7 @@ $functions = array(
         // Validate the "amount" parameter has been set to a valid value
         if (!isset($this_skill->skill_parameters['amount'])
             || !is_numeric($this_skill->skill_parameters['amount'])
-            || !($this_skill->skill_parameters['amount'] > 0)){
+            || !($this_skill->skill_parameters['amount'] > 0 || $this_skill->skill_parameters['amount'] < 0)){
             error_log('skill parameter "amount" was not set or was invalid ('.$this_skill->skill_token.':'.__LINE__.')');
             if (isset($this_skill->skill_parameters['amount'])){
                 error_log('amount = '.print_r($this_skill->skill_parameters['amount'], true));
