@@ -61,9 +61,22 @@ $functions = array(
         // Ensure the requested field multiplier isn't already at max value
         if (!isset($this_field->field_multipliers[$boost_type]) || $this_field->field_multipliers[$boost_type] < MMRPG_SETTINGS_MULTIPLIER_MAX){
 
+            // Create or increase the elemental booster for this field
+            $temp_change_percent = $boost_amount;
+            $temp_change_kind = $boost_amount > 0 ? 'boost' : 'break';
+            $new_multiplier_value = (isset($this_field->field_multipliers[$boost_type]) ? $this_field->field_multipliers[$boost_type] : 1) + $temp_change_percent;
+            if ($new_multiplier_value >= MMRPG_SETTINGS_MULTIPLIER_MAX){
+                $temp_change_percent = $new_multiplier_value - MMRPG_SETTINGS_MULTIPLIER_MAX;
+                $new_multiplier_value = MMRPG_SETTINGS_MULTIPLIER_MAX;
+            } elseif ($new_multiplier_value <= MMRPG_SETTINGS_MULTIPLIER_MIN){
+                $temp_change_percent = $new_multiplier_value - MMRPG_SETTINGS_MULTIPLIER_MIN;
+                $new_multiplier_value = MMRPG_SETTINGS_MULTIPLIER_MIN;
+            }
+            $this_field->set_multiplier($boost_type, $new_multiplier_value);
+
             // Collect the elemental type arrow index and sprite sheet
             $this_type_token = !empty($boost_type) ? $boost_type : 'none';
-            $this_arrow_index = rpg_prototype::type_arrow_image('boost', $this_type_token);
+            $this_arrow_index = rpg_prototype::type_arrow_image($temp_change_kind, $this_type_token);
             $this_types_index = rpg_type::get_index();
 
             // Collect the type colours so we can use them w/ effects
@@ -89,7 +102,7 @@ $functions = array(
                 'attachment_token' => $fx_attachment_token,
                 'sticky' => true,
                 'skill_token' => $this_skill->skill_token,
-                'skill_image' => '_effects/arrow-overlay_boost-2',
+                'skill_image' => '_effects/arrow-overlay_'.$temp_change_kind.'-2',
                 'skill_frame' => 0,
                 'skill_frame_animate' => array(0),
                 'skill_frame_offset' => array('x' => -5, 'y' => 20, 'z' => -100),
@@ -102,21 +115,30 @@ $functions = array(
             $this_robot->set_attachment($this_attachment_token, $this_attachment_info);
             $this_robot->set_attachment($fx_attachment_token, $fx_attachment_info);
 
-            // Create or increase the elemental booster for this field
-            $temp_change_percent = $boost_amount;
-            $new_multiplier_value = (isset($this_field->field_multipliers[$boost_type]) ? $this_field->field_multipliers[$boost_type] : 1) + $temp_change_percent;
-            if ($new_multiplier_value >= MMRPG_SETTINGS_MULTIPLIER_MAX){
-                $temp_change_percent = $new_multiplier_value - MMRPG_SETTINGS_MULTIPLIER_MAX;
-                $new_multiplier_value = MMRPG_SETTINGS_MULTIPLIER_MAX;
-            }
-            $this_field->set_multiplier($boost_type, $new_multiplier_value);
-
             // Create the event to show this element boost
             if ($temp_change_percent > 0){
                 $print_multiplier_value = number_format($new_multiplier_value, 1);
                 $this_battle->events_create($this_robot, false, $this_robot->robot_name.'\'s '.$this_skill->skill_name,
                     $this_robot->print_name().'\'s '.$this_skill->print_name().' skill kicked in!<br />'.
                     'The <span class="skill_stat type '.$boost_type.'">'.ucfirst($boost_type).'</span> field multiplier rose to <span class="skill_stat type none">'.$print_multiplier_value.'</span>!',
+                    array(
+                        'this_skill' => $this_skill,
+                        'canvas_show_this_skill_overlay' => true,
+                        'canvas_show_this_skill_underlay' => false,
+                        'event_flag_camera_action' => true,
+                        'event_flag_camera_side' => $this_robot->player->player_side,
+                        'event_flag_camera_focus' => $this_robot->robot_position,
+                        'event_flag_camera_depth' => $this_robot->robot_key,
+                        'event_flag_sound_effects' => array(
+                            array('name' => 'field-boost', 'volume' => 1.5)
+                            )
+                        )
+                    );
+            } elseif ($temp_change_percent < 0){
+                $print_multiplier_value = number_format($new_multiplier_value, 1);
+                $this_battle->events_create($this_robot, false, $this_robot->robot_name.'\'s '.$this_skill->skill_name,
+                    $this_robot->print_name().'\'s '.$this_skill->print_name().' skill kicked in!<br />'.
+                    'The <span class="skill_stat type '.$boost_type.'">'.ucfirst($boost_type).'</span> field multiplier fell to <span class="skill_stat type none">'.$print_multiplier_value.'</span>!',
                     array(
                         'this_skill' => $this_skill,
                         'canvas_show_this_skill_overlay' => true,
@@ -171,7 +193,7 @@ $functions = array(
         // Validate the "amount" parameter has been set to a valid value
         if (!isset($this_skill->skill_parameters['amount'])
             || !is_numeric($this_skill->skill_parameters['amount'])
-            || !($this_skill->skill_parameters['amount'] > 0)){
+            || !($this_skill->skill_parameters['amount'] > 0 || $this_skill->skill_parameters['amount'] < 0)){
             error_log('skill parameter "amount" was not set or was invalid ('.$this_skill->skill_token.':'.__LINE__.')');
             if (isset($this_skill->skill_parameters['amount'])){
                 error_log('amount = '.print_r($this_skill->skill_parameters['amount'], true));
