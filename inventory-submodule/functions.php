@@ -30,6 +30,7 @@ $functions = array(
         return true;
     },
     'rpg-robot_check-skills_end-of-turn' => function($objects){
+        //error_log('rpg-robot_check-skills_end-of-turn() for '.$objects['this_robot']->robot_token);
 
         // Extract objects into the global scope
         extract($objects);
@@ -37,200 +38,225 @@ $functions = array(
         // If this skill was not validated we cannot proceed
         if (empty($this_skill->flags['validated'])){ return false; }
 
-        // If this robot is not owned by a humnan player it doesn't work
-        if ($this_player->player_side !== 'left'){ return false; }
-
-        // If we don't have access to the inventory this skill doesn't work
-        $allow_inventory_access = $this_battle->allow_inventory_access();
-        if (!$allow_inventory_access){ return false; }
-
-        //error_log('end-of-turn check for this skill');
-
-        // Use the robot's current level to determine which tier items they'll find
-        $max_item_tier = 1;
-        if ($this_robot->robot_level >= 33){ $max_item_tier += 1; }
-        if ($this_robot->robot_level >= 66){ $max_item_tier += 1; }
-        if ($this_robot->robot_level >= 99){ $max_item_tier += 1; }
-        //error_log('$max_item_tier = '.print_r($max_item_tier, true));
-
-        // Use the robot's current level (and/or held item) to determine how many chances they get
-        $max_trigger_chances = 1;
-        if ($this_robot->robot_level >= 20){ $max_trigger_chances += 1; }
-        if ($this_robot->robot_level >= 40){ $max_trigger_chances += 1; }
-        if ($this_robot->robot_level >= 60){ $max_trigger_chances += 1; }
-        if ($this_robot->robot_level >= 80){ $max_trigger_chances += 1; }
-        if ($this_robot->robot_level >= 100){ $max_trigger_chances += 1; }
-        if ($this_robot->robot_item == 'fortune-module'){ $max_trigger_chances += 1; }
-        //error_log('$max_trigger_chances = '.print_r($max_trigger_chances, true));
-
         // Define a boolean to check if skill will trigger
-        $trigger_skill = false;
-
-        // If the robot isn't lucky this turn, the skill doesn't work
-        $battle_turn = $this_battle->counters['battle_turn'];
-        $lucky_number = $this_skill->values['skill_lucky_number'];
-        $lucky_int = intval(substr(($battle_turn + $lucky_number), -1, 1));
-        //error_log('$battle_turn = '.print_r($battle_turn, true));
-        //error_log('$lucky_number = '.print_r($lucky_number, true));
-        //error_log('$lucky_int ('.print_r(($battle_turn + $lucky_number), true).') = '.print_r($lucky_int, true));
-        $trigger_stats = array('energy', 'weapons', 'attack', 'defense', 'speed', 'level');
-        $check_stats = array_slice($trigger_stats, 0, $max_trigger_chances);
-        //error_log('$trigger_stats = '.print_r($trigger_stats, true));
-        //error_log('$check_stats = '.print_r($check_stats, true));
-        foreach ($check_stats AS $stat){
-            $prop_name = 'robot_'.$stat;
-            $stat_int = intval(substr($this_robot->$prop_name, -1, 1));
-            //error_log('$'.$stat.'_int('.$stat_int.') vs $lucky_int('.$lucky_int.')');
-            if ($stat_int === $lucky_int){ $trigger_skill = true; break; }
-        }
+        $trigger_skill = true;
 
         // If we're not allowed to trigger the skill now, return false
         //error_log('$trigger_skill = '.($trigger_skill ? 'true' : 'false'));
         if (!$trigger_skill){ return false; }
+        //error_log('we can trigger the skill now');
 
-        // Define a variable to hold the item drop table with options/weights
-        $item_drop_table = array();
+        // Define the base arrays of allowed items types (unfiltered)
+        $base_allowed_item_stats = array('energy', 'weapons', 'attack', 'defense', 'speed');
+        $base_allowed_item_kinds = array('pellets', 'capsules', 'tanks');
 
-        // Collect the various drop flags we're allow to use
-        $allowed_item_kinds = $this_skill->values['skill_allowed_item_kinds'];
-        //error_log('$allowed_item_kinds = '.print_r($allowed_item_kinds, true));
+        // Collect the arrays of allowed items types (filtered by the validator)
+        $allowed_item_stats = $this_skill->get_value('skill_allowed_item_stats');
+        $allowed_item_kinds = $this_skill->get_value('skill_allowed_item_kinds');
 
-        // Generate an array of elemental weights to use with shard/core drops
-        $allowed_types = rpg_type::get_index(false, false, false, true);
-        $allowed_type_weights = array();
-        if (!empty($this_field->field_multipliers)){
-            foreach ($this_field->field_multipliers AS $temp_type => $temp_multiplier){
-                if ($temp_multiplier <= 1){ continue; }
-                elseif (!isset($allowed_types[$temp_type])){ continue; }
-                $allowed_type_weights[$temp_type] = $temp_multiplier;
-            }
-        }
-        //error_log('$allowed_type_weights = '.print_r($allowed_type_weights, true));
+        // Define an array to hold the inventory gifts we may or may not be giving out
+        $inventory_gifts_array = array();
 
-        // If SCREWS are allowed to be found, add them to the drop table
-        if (in_array('all', $allowed_item_kinds)
-            || in_array('screws', $allowed_item_kinds)){
-            $item_drop_table['small-screw'] = 20;
-            if ($max_item_tier >= 2){
-                $item_drop_table['large-screw'] = 5;
-            }
-        }
+        // Loop through all of this player's robots to see which types of items we could theoretically give them
+        $this_robots_active = $this_player->get_robots_active();
+        foreach ($this_robots_active AS $key => $robot){
+            //error_log('checking robot '.$robot->robot_token);
 
-        // If PELLETS are allowed to be found, add them to the drop table
-        if (in_array('all', $allowed_item_kinds)
-            || in_array('pellets', $allowed_item_kinds)){
-            $item_drop_table['energy-pellet'] = 4;
-            $item_drop_table['weapon-pellet'] = 4;
-            if ($max_item_tier >= 2){
-                $item_drop_table['attack-pellet'] = 3;
-                $item_drop_table['defense-pellet'] = 3;
-                $item_drop_table['speed-pellet'] = 3;
-                if ($max_item_tier >= 3){
-                    $item_drop_table['super-pellet'] = 1;
-                }
-            }
-        }
+            // We're not allowed to use this skill on ourselves
+            if ($robot->robot_id == $this_robot->robot_id){ continue; }
 
-        // If CAPSULES are allowed to be found, add them to the drop table
-        if (in_array('all', $allowed_item_kinds)
-            || in_array('capsules', $allowed_item_kinds)){
-            $item_drop_table['energy-capsule'] = 3;
-            $item_drop_table['weapon-capsule'] = 3;
-            if ($max_item_tier >= 3){
-                $item_drop_table['attack-capsule'] = 2;
-                $item_drop_table['defense-capsule'] = 2;
-                $item_drop_table['speed-capsule'] = 2;
-                if ($max_item_tier >= 4){
-                    $item_drop_table['super-capsule'] = 1;
-                }
-            }
-        }
+            // Define a mini-array to hold the items that would be appropriate given context
+            $items = array();
+            $priority = 0;
 
-        // If TANKS are allowed to be found, add them to the drop table
-        if (in_array('all', $allowed_item_kinds)
-            || in_array('tanks', $allowed_item_kinds)){
-            if ($max_item_tier >= 2){
-                $item_drop_table['energy-tank'] = 3;
-                $item_drop_table['weapon-tank'] = 3;
-            }
-        }
+            // Review the robot's energy and weapons and determine which health or ammo items we could give them
+            if ($robot->robot_energy <= ceil($robot->robot_base_energy / 3)){ $items[] = 'energy-tank'; $priority += 3; }
+            if ($robot->robot_weapons <= ceil($robot->robot_base_weapons / 3)){ $items[] = 'weapon-tank'; $priority += 3; }
+            if ($robot->robot_energy <= ceil($robot->robot_base_energy * 0.6)){ $items[] = 'energy-capsule'; $priority += 2; }
+            if ($robot->robot_weapons <= ceil($robot->robot_base_weapons * 0.6)){ $items[] = 'weapon-capsule'; $priority += 2; }
+            if ($robot->robot_energy <= ceil($robot->robot_base_energy * 0.85)){ $items[] = 'energy-pellet'; $priority += 1; }
+            if ($robot->robot_weapons <= ceil($robot->robot_base_weapons * 0.85)){ $items[] = 'weapon-pellet'; $priority += 1; }
 
-        // If SHARDS are allowed to be found, add them to the drop table
-        if (in_array('all', $allowed_item_kinds)
-            || in_array('shards', $allowed_item_kinds)){
-            if (!empty($allowed_type_weights) && $max_item_tier >= 2){
-                foreach ($allowed_type_weights AS $temp_type => $temp_weight){
-                    $item_drop_table[$temp_type.'-shard'] = round($temp_weight * 10) * ($max_item_tier - 1);
-                }
-            }
-        }
+            // Review the robot's attack, defense, and speed to see which items could we give them
+            if (!empty($robot->counters['attack_mods']) && $robot->counters['attack_mods'] <= -2){ $items[] = 'attack-capsule'; $priority += 2; }
+            if (!empty($robot->counters['attack_mods']) && $robot->counters['attack_mods'] <= -1){ $items[] = 'attack-pellet'; $priority += 1; }
+            if (!empty($robot->counters['defense_mods']) && $robot->counters['defense_mods'] <= -2){ $items[] = 'defense-capsule'; $priority += 2; }
+            if (!empty($robot->counters['defense_mods']) && $robot->counters['defense_mods'] <= -1){ $items[] = 'defense-pellet'; $priority += 1; }
+            if (!empty($robot->counters['speed_mods']) && $robot->counters['speed_mods'] <= -2){ $items[] = 'speed-capsule'; $priority += 2; }
+            if (!empty($robot->counters['speed_mods']) && $robot->counters['speed_mods'] <= -1){ $items[] = 'speed-pellet'; $priority += 1; }
 
-        // If CORES are allowed to be found, add them to the drop table
-        if (in_array('all', $allowed_item_kinds)
-            || in_array('cores', $allowed_item_kinds)){
-            if (!empty($allowed_type_weights) && $max_item_tier >= 3){
-                foreach ($allowed_type_weights AS $temp_type => $temp_weight){
-                    $item_drop_table[$temp_type.'-core'] = round($temp_weight * 2) * ($max_item_tier - 1);
-                }
-            }
-        }
-
-        //error_log('$item_drop_table(A) = '.print_r($item_drop_table, true));
-
-        // Loop through the drop table and remove any items we already have the max limit of
-        if (!empty($item_drop_table)){
-            foreach ($item_drop_table AS $item_token => $item_weight){
-                $item_count = mmrpg_prototype_get_battle_item_count($item_token);
-                if (strstr($item_token, '-shard')){
-                    $shard_count = $item_count;
-                    $core_count = mmrpg_prototype_get_battle_item_count(str_replace('-shard', '-core', $item_token));
-                    if (($shard_count + 1) >= MMRPG_SETTINGS_SHARDS_MAXQUANTITY
-                        && $core_count >= MMRPG_SETTINGS_ITEMS_MAXQUANTITY){
-                        unset($item_drop_table[$item_token]);
-                        continue;
-                    }
-                } elseif ($item_count >= MMRPG_SETTINGS_ITEMS_MAXQUANTITY){
-                    unset($item_drop_table[$item_token]);
-                    continue;
-                }
-            }
-        }
-
-        //error_log('$item_drop_table(B) = '.print_r($item_drop_table, true));
-
-        // If a drop table was generated, check to see which item might randomly be picked up
-        if (!empty($item_drop_table)){
-
-            $options = array_keys($item_drop_table);
-            $weights = array_values($item_drop_table);
-            $item_token = $this_battle->weighted_chance($options, $weights);
-
-            //error_log('$item_token = '.print_r($item_token, true));
-
-            // If an item was actually found, we can display the skill message now and equip
-            if (!empty($item_token)){
-
-                // If this robot has a stat-based skill, display the trigger text separately
-                $this_robot->set_frame('defend');
-                $this_battle->events_create($this_robot, false, $this_robot->robot_name.'\'s '.$this_skill->skill_name,
-                    $this_robot->print_name().'\'s '.$this_skill->print_name().' skill kicked in!<br />'.
-                    ucfirst($this_robot->get_pronoun('subject')).' started digging the ground below...',
-                    array(
-                        'this_skill' => $this_skill,
-                        'canvas_show_this_skill_overlay' => false,
-                        'canvas_show_this_skill_underlay' => true,
-                        'event_flag_camera_action' => true,
-                        'event_flag_camera_side' => $this_robot->player->player_side,
-                        'event_flag_camera_focus' => $this_robot->robot_position,
-                        'event_flag_camera_depth' => $this_robot->robot_key
-                        )
+            // If items were found, add them to the inventory gifts array
+            //error_log('$items '.print_r($items, true));
+            //error_log('$priority = '.$priority);
+            if (!empty($items)){
+                //error_log('$items '.print_r($items, true));
+                $inventory_gifts_array[] = array(
+                    'robot' => $robot,
+                    'items' => $items,
+                    'priority' => $priority
                     );
+            }
 
-                // Trigger the actual item drop function on for the player
-                //error_log('rpg_player::trigger_item_find() w/ '.print_r($item_token, true));
-                rpg_player::trigger_item_find($this_battle, $this_player, $this_robot, 0, $item_token, 1);
+        }
+        //error_log('$allowed_item_stats = '.print_r($allowed_item_stats, true));
+        //error_log('$allowed_item_kinds = '.print_r($allowed_item_kinds, true));
+        //error_log('$inventory_gifts_array = '.print_r(array_map(function($a){ $a['robot'] = $a['robot']->robot_string; return $a; }, $inventory_gifts_array), true));
+
+        // Re-sort the gifts array by priority with highest at the top
+        usort($inventory_gifts_array, function($a, $b){
+            if ($a['priority'] == $b['priority']){ return 0; }
+            return ($a['priority'] > $b['priority']) ? -1 : 1;
+            });
+
+        // Loop through the list of inventory gifts and try to find one we can give out
+        $inventory_gift = false;
+        foreach ($inventory_gifts_array AS $key => $gift){
+            //error_log('checking gift key:'.$key.' | robot:'.$gift['robot']->robot_token.' | priority:'.$gift['priority']);
+            if (empty($gift['items'])){ continue; }
+            //error_log('- gift items = '.print_r($gift['items'], true));
+            foreach ($gift['items'] AS $item){
+                list($item_stat, $item_kind) = explode('-', $item);
+                if ($item_stat === 'weapon'){ $item_stat .= 's'; }
+                $item_kind .= 's';
+                //error_log('-- checking item '.$item.' (stat:'.$item_stat.' / kind:'.$item_kind.')');
+                if (in_array($item_stat, $allowed_item_stats)
+                    && in_array($item_kind, $allowed_item_kinds)){
+                    //error_log('--- found allowed item '.$item.' (!)');
+                    $gift['item'] = $item;
+                    $inventory_gift = $gift;
+                    break;
+                }
+            }
+            if ($inventory_gift){ break; }
+        }
+
+        // If an allowed inventory gift was found, we can give it to the target
+        if (!empty($inventory_gift) && !empty($inventory_gift['item'])){
+
+            //error_log('allowed inventory gift found!');
+            //error_log('$inventory_gift//robot = '.$inventory_gift['robot']->robot_token);
+            //error_log('$inventory_gift//priority = '.$inventory_gift['priority']);
+            //error_log('$inventory_gift//item = '.print_r($inventory_gift['item'], true));
+
+            // Display the message about pulling out an item (be vague with the wording)
+            $find_frame = !empty($this_skill->skill_parameters['frame']) ? $this_skill->skill_parameters['frame'] : 'summon';
+            $this_robot->set_frame($find_frame);
+            $this_battle->events_create($this_robot, false, $this_robot->robot_name.'\'s '.$this_skill->skill_name,
+                $this_robot->print_name().'\'s '.$this_skill->print_name().' skill kicked in!<br />'.
+                ucfirst($this_robot->get_pronoun('subject')).' pulled out an item...',
+                array(
+                    'this_skill' => $this_skill,
+                    'canvas_show_this_skill_overlay' => false,
+                    'canvas_show_this_skill_underlay' => true,
+                    'event_flag_camera_action' => true,
+                    'event_flag_camera_side' => $this_robot->player->player_side,
+                    'event_flag_camera_focus' => $this_robot->robot_position,
+                    'event_flag_camera_depth' => $this_robot->robot_key
+                    )
+                );
+            $this_robot->reset_frame();
+
+            // Define this ability's attachment token
+            $temp_rotate_amount = -15;
+            $item_attachment_token = 'item_'.$inventory_gift['item'];
+            $item_attachment_info = array(
+                'class' => 'item',
+                'sticky' => true,
+                'attachment_token' => $item_attachment_token,
+                'item_token' => $inventory_gift['item'],
+                'item_frame' => 0,
+                'item_frame_animate' => array(0),
+                'item_frame_offset' => array('x' => 30, 'y' => 20, 'z' => 20),
+                'item_frame_styles' => 'opacity: 0.75; transform: rotate('.$temp_rotate_amount.'deg); -webkit-transform: rotate('.$temp_rotate_amount.'deg); -moz-transform: rotate('.$temp_rotate_amount.'deg); '
+                );
+
+            // Generate an object representing this temporary item we can display it
+            $this_gift_token = $inventory_gift['item'];
+            $this_gift_item = rpg_game::get_item($this_battle, $this_player, $inventory_gift['robot'], array('item_token' => $this_gift_token));
+            $inventory_gift['robot']->set_attachment($item_attachment_token, $item_attachment_info);
+
+            // Collect details about the stat and kind we're dealing with
+            list($item_stat, $item_kind) = explode('-', $item);
+            if ($item_stat === 'weapon'){ $item_stat .= 's'; }
+            $item_kind .= 's';
+            //error_log('$item_stat = '.print_r($item_stat, true));
+            //error_log('$item_kind = '.print_r($item_kind, true));
+
+            // Since we're dealing with energy/weapon/stat-based consumables, we just apply each one a bit different
+            if ($item_stat == 'energy' || $item_stat == 'weapons'){
+
+                // Define which stat(s) we're boosting and by how much
+                $stat_boost_amount = 0;
+                $stat_boost_tokens = array($item_stat);
+                if ($item_kind == 'pellets'){ $stat_boost_amount = 25; }
+                elseif ($item_kind == 'capsules'){ $stat_boost_amount = 50; }
+                elseif ($item_kind == 'tanks'){ $stat_boost_amount = 100; }
+                //error_log('$stat_boost_amount = '.print_r($stat_boost_amount, true));
+                //error_log('$stat_boost_tokens = '.print_r($stat_boost_tokens, true));
+
+                // If we're dealing with an energy-based consumable
+                if (in_array('energy', $stat_boost_tokens)){
+
+                    $this_gift_item->recovery_options_update(array(
+                        'kind' => 'energy',
+                        'percent' => true,
+                        'modifiers' => false,
+                        'frame' => 'taunt',
+                        'success' => array(9, 0, 0, -9999, $inventory_gift['robot']->print_name().'\'s life energy was restored!'),
+                        'failure' => array(9, 0, 0, -9999, $inventory_gift['robot']->print_name().'\'s life energy was not affected...')
+                        ));
+                    $energy_recovery_amount = ceil($inventory_gift['robot']->robot_base_energy * ($stat_boost_amount / 100));
+                    $inventory_gift['robot']->trigger_recovery($inventory_gift['robot'], $this_gift_item, $energy_recovery_amount);
+                    //error_log('$energy_recovery_amount = '.print_r($energy_recovery_amount, true));
+
+                }
+
+                // If we're dealing with a weapons-based consumable
+                if (in_array('weapons', $stat_boost_tokens)){
+
+                    // Increase this robot's life energy stat
+                    $this_gift_item->recovery_options_update(array(
+                        'kind' => 'weapons',
+                        'percent' => true,
+                        'modifiers' => false,
+                        'frame' => 'taunt',
+                        'success' => array(9, 0, 0, -9999, $inventory_gift['robot']->print_name().'\'s weapon energy was restored!'),
+                        'failure' => array(9, 0, 0, -9999, $inventory_gift['robot']->print_name().'\'s weapon energy was not affected...')
+                        ));
+                    $weapons_recovery_amount = ceil($inventory_gift['robot']->robot_base_weapons * ($stat_boost_amount / 100));
+                    $inventory_gift['robot']->trigger_recovery($inventory_gift['robot'], $this_gift_item, $weapons_recovery_amount);
+                    //error_log('$weapons_recovery_amount = '.print_r($weapons_recovery_amount, true));
+
+                }
 
             }
+            // Otherwise for all other stat-based consumables
+            else {
+
+                // Define the stat(s) this item will boost and how much
+                $stat_boost_amount = 0;
+                $stat_boost_tokens = array();
+                if ($item_stat == 'super'){ $stat_boost_amount = $item_kind == 'capsules' ? 2 : 1; }
+                else { $stat_boost_amount = $item_kind == 'capsules' ? 3 : 2; }
+                if ($item_stat == 'attack' || $item_stat == 'super'){ $stat_boost_tokens[] = 'attack'; }
+                if ($item_stat == 'defense' || $item_stat == 'super'){ $stat_boost_tokens[] = 'defense'; }
+                if ($item_stat == 'speed' || $item_stat == 'super'){ $stat_boost_tokens[] = 'speed'; }
+                //$this_battle->events_create(false, false, 'DEBUG', 'it was a basic stat item! <br /> $stat_boost_amount = '.$stat_boost_amount.' | $stat_boost_tokens = '.implode(',', $stat_boost_tokens));
+                //error_log('$stat_boost_amount = '.print_r($stat_boost_amount, true));
+                //error_log('$stat_boost_tokens = '.print_r($stat_boost_tokens, true));
+
+                // Loop through and boost relevant stats as if this item was consumed
+                if (!empty($stat_boost_tokens)){
+                    foreach ($stat_boost_tokens AS $stat_token){
+                        // Call the global stat boost function with customized options
+                        rpg_ability::ability_function_stat_boost($inventory_gift['robot'], $stat_token, $stat_boost_amount, $this_skill);
+                    }
+                }
+
+            }
+
+            // Remove the visual item attachment as we're done with it
+            $inventory_gift['robot']->unset_attachment($item_attachment_token);
 
         }
 
@@ -239,6 +265,7 @@ $functions = array(
 
     },
     'skill_function_onload' => function($objects){
+        //error_log('skill_function_onload() for '.$objects['this_robot']->robot_token);
 
         // Extract objects into the global scope
         extract($objects);
@@ -255,12 +282,25 @@ $functions = array(
 
         // We need to make sure at least one flag has been set, otherwise not validated
         $true_flags = array();
-        $allowed_flags = array_merge(array('all'), $allowed_item_kinds);
+        $allowed_flags = array_merge(array('all'), $allowed_item_stats, $allowed_item_kinds);
         foreach ($allowed_flags AS $flag_name){
             if (isset($this_skill->skill_parameters[$flag_name])
                 && !empty($this_skill->skill_parameters[$flag_name])){
                 $true_flags[] = $flag_name;
             }
+        }
+
+        // Validate the "frame" parameter has been set to a valid value, else use default
+        if (isset($this_skill->skill_parameters['frame'])){
+            if (!is_string($this_skill->skill_parameters['frame'])){
+                //error_log('skill parameter "frame" was not a string value ('.$this_skill->skill_token.':'.__LINE__.')');
+                //error_log('frame = '.print_r($this_skill->skill_parameters['frame'], true));
+                $this_skill->set_flag('validated', false);
+                return false;
+            }
+        } else {
+            // Otherwise make sure this at least exists
+            $this_skill->skill_parameters['frame'] = '';
         }
 
         // If none of the allowed flags were set, we have a problem
@@ -273,7 +313,17 @@ $functions = array(
 
         // If the "all" parameter was set to true, allow all items, else filter given parameters
         $allow_all_kinds = isset($this_skill->skill_parameters['all']) && !empty($this_skill->skill_parameters['all']) ? true : false;
+        //error_log('$allow_all_kinds = '.print_r($allow_all_kinds, true));
         if (!$allow_all_kinds){
+            foreach ($allowed_item_stats AS $key => $stat){
+                if (!isset($this_skill->skill_parameters[$stat])
+                    || empty($this_skill->skill_parameters[$stat])){
+                    unset($allowed_item_stats[$key]);
+                    continue;
+                }
+            }
+            $allowed_item_stats = array_values($allowed_item_stats);
+            //error_log('$allowed_item_stats = '.print_r($allowed_item_stats, true));
             foreach ($allowed_item_kinds AS $key => $kind){
                 if (!isset($this_skill->skill_parameters[$kind])
                     || empty($this_skill->skill_parameters[$kind])){
@@ -282,11 +332,14 @@ $functions = array(
                 }
             }
             $allowed_item_kinds = array_values($allowed_item_kinds);
+            //error_log('$allowed_item_kinds = '.print_r($allowed_item_kinds, true));
         }
 
         // Otherwise, define a variable with all the allowed drop types
+        $this_skill->set_value('skill_allowed_item_stats', $allowed_item_stats);
         $this_skill->set_value('skill_allowed_item_kinds', $allowed_item_kinds);
-        //error_log('$allowed_item_kinds = '.print_r($allowed_item_kinds, true));
+        //error_log('final $allowed_item_stats = '.print_r($allowed_item_stats, true));
+        //error_log('final $allowed_item_kinds = '.print_r($allowed_item_kinds, true));
 
         // Everything is fine so let's return true
         return true;
