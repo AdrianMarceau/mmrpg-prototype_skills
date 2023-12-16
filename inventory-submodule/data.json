@@ -1,0 +1,13 @@
+{
+    "skill_token": "inventory-submodule",
+    "skill_name": "Inventory Submodule",
+    "skill_class": "skill",
+    "skill_description": "[dynamic] Gives one ally a consumable item at end-of-turn phase",
+    "skill_description2": "The robot gives an ally-in-need a consumable item at the end of the turn, possibly when certain conditions are met, and possibly only once.  Required parameters must be set on the robot to use this skill (see the \"Functions\" tab for details) and the short\/long description must be customized.",
+    "skill_parameters": {
+        "all": true
+    },
+    "skill_flag_hidden": 0,
+    "skill_flag_complete": 1,
+    "skill_flag_published": 1
+}
