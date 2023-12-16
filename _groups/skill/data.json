@@ -52,7 +52,8 @@
             "metronome-submodule",
             "hyperscan-submodule",
             "nightmare-submodule",
-            "transport-submodule"
+            "transport-submodule",
+            "wellspring-submodule"
         ]
     },
     "Anti-Stat Skills": {
@@ -94,7 +95,9 @@
             "medic-submodule",
             "armorer-submodule",
             "recycler-submodule",
-            "drowsing-submodule"
+            "inventory-submodule",
+            "drowsing-submodule",
+            "consumable-item-at-end-of-turn"
         ]
     },
     "Stat Boost Skills": {
