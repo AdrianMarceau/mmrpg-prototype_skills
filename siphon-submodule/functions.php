@@ -10,6 +10,7 @@ $functions = array(
 
     },
     'rpg-robot_check-skills_battle-start' => function($objects){
+        error_log('rpg-robot_check-skills_battle-start() for '.$objects['this_robot']->robot_string.' w/ '.$objects['this_skill']->skill_token);
 
         // Extract all objects into the current scope
         extract($objects);
@@ -46,6 +47,17 @@ $functions = array(
         if ($options->damage_initiator !== $this_robot){ return false; }
         if (empty($options->damage_target)){ return false; }
         $target_robot = $options->damage_target;
+
+        // If the ability was not successful, then the skill doesn't activate
+        //error_log('this ability result = '.$this_ability->ability_results['this_result']);
+        //error_log('this ability amount = '.$this_ability->ability_results['this_amount']);
+        if (!empty($this_ability->ability_results['this_result'])
+            && $this_ability->ability_results['this_result'] === 'failure'){
+            return false;
+        } elseif (isset($this_ability->ability_results['this_amount'])
+            && empty($this_ability->ability_results['this_amount'])){
+            return false;
+        }
 
         // If the target has no weapons, the user is full, or the skill is otherwise blocked, then we return early
         if ($this_robot->robot_status === 'disabled'){ return false; }
