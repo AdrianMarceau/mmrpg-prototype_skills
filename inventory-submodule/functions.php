@@ -138,24 +138,6 @@ $functions = array(
             //error_log('$inventory_gift//priority = '.$inventory_gift['priority']);
             //error_log('$inventory_gift//item = '.print_r($inventory_gift['item'], true));
 
-            // Display the message about pulling out an item (be vague with the wording)
-            $find_frame = !empty($this_skill->skill_parameters['frame']) ? $this_skill->skill_parameters['frame'] : 'summon';
-            $this_robot->set_frame($find_frame);
-            $this_battle->events_create($this_robot, false, $this_robot->robot_name.'\'s '.$this_skill->skill_name,
-                $this_robot->print_name().'\'s '.$this_skill->print_name().' skill kicked in!<br />'.
-                ucfirst($this_robot->get_pronoun('subject')).' pulled out an item...',
-                array(
-                    'this_skill' => $this_skill,
-                    'canvas_show_this_skill_overlay' => false,
-                    'canvas_show_this_skill_underlay' => true,
-                    'event_flag_camera_action' => true,
-                    'event_flag_camera_side' => $this_robot->player->player_side,
-                    'event_flag_camera_focus' => $this_robot->robot_position,
-                    'event_flag_camera_depth' => $this_robot->robot_key
-                    )
-                );
-            $this_robot->reset_frame();
-
             // Define this ability's attachment token
             $temp_rotate_amount = -15;
             $item_attachment_token = 'item_'.$inventory_gift['item'];
@@ -173,6 +155,27 @@ $functions = array(
             // Generate an object representing this temporary item we can display it
             $this_gift_token = $inventory_gift['item'];
             $this_gift_item = rpg_game::get_item($this_battle, $this_player, $inventory_gift['robot'], array('item_token' => $this_gift_token));
+
+            // Display the message about pulling out an item (be vague with the wording)
+            $find_frame = !empty($this_skill->skill_parameters['frame']) ? $this_skill->skill_parameters['frame'] : 'summon';
+            $this_robot->set_frame($find_frame);
+            $this_battle->events_create($this_robot, false, $this_robot->robot_name.'\'s '.$this_skill->skill_name,
+                $this_robot->print_name().'\'s '.$this_skill->print_name().' skill kicked in!<br />'.
+                ucfirst($this_robot->get_pronoun('subject')).' pulled out '.(preg_match('/^(a|e|i|o|u)/i', $this_gift_token) ? 'an' : 'a').' '.$this_gift_item->print_name().'!',
+                array(
+                    'this_skill' => $this_skill,
+                    'canvas_show_this_skill_overlay' => false,
+                    'canvas_show_this_skill_underlay' => true,
+                    'event_flag_camera_action' => true,
+                    'event_flag_camera_side' => $this_robot->player->player_side,
+                    'event_flag_camera_focus' => $this_robot->robot_position,
+                    'event_flag_camera_depth' => $this_robot->robot_key
+                    )
+                );
+            $this_robot->reset_frame();
+
+
+            // Attach the item to the recipient robot
             $inventory_gift['robot']->set_attachment($item_attachment_token, $item_attachment_info);
 
             // Collect details about the stat and kind we're dealing with
