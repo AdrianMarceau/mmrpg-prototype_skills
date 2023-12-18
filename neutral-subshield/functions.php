@@ -82,6 +82,26 @@ $functions = array(
         // Return true on success
         return true;
     
+    },
+    'rpg-skill_disable-skill_before' => function($objects){
+
+        // Extract all objects into the current scope
+        extract($objects);
+
+        // We need to remove the attachment and convert this robot to their sheilds-down image
+        $this_attachment_token = $this_robot->robot_token.'_'.$this_skill->skill_token;
+        $is_shielded = $this_robot->has_attachment($this_attachment_token) ? true : false;
+        if ($is_shielded){
+
+            // Unset the attachment from the current robot and save
+            $backup_attachment_info = $this_robot->get_attachment($this_attachment_token);
+            $this_robot->unset_attachment($this_attachment_token);
+
+        }
+
+        // Return true on success
+        return true;
+
     }
 );
 ?>
