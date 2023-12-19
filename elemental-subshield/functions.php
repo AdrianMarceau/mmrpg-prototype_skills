@@ -16,7 +16,7 @@ $functions = array(
         extract($objects);
 
         // Add an invisible attachment preventing this robot from damaged by neutral-type abilities
-        $this_attachment_token = $this_robot->robot_token.'_'.$this_skill->skill_token;
+        $this_attachment_token = $this_skill->skill_token.'_input-breaker';
         $is_shielded = $this_robot->has_attachment($this_attachment_token) ? true : false;
         if (!$is_shielded){
 
@@ -59,6 +59,32 @@ $functions = array(
         if ($options->damage_target !== $this_robot){ return false; }
         //error_log('WE ARE THE TARGET!  Check if we should block damage...');
 
+        // Add an invisible attachment preventing this robot from damaged by neutral-type abilities
+        $this_attachment_token = $this_skill->skill_token.'_input-breaker';
+        $is_shielded = $this_robot->has_attachment($this_attachment_token) ? true : false;
+        if (!$is_shielded){
+
+            // Define this ability's attachment token
+            $types = rpg_type::get_index();
+            $this_attachment_info = array(
+                'class' => 'ability',
+                'ability_token' => 'ability',
+                'ability_image' => false,
+                'ability_frame' => 0,
+                'ability_frame_animate' => array(0),
+                'ability_frame_offset' => array('x' => 0, 'y' => 0, 'z' => 0)
+                );
+            foreach ($types AS $type){
+                if ($type['type_class'] !== 'normal'){ continue; }
+                $this_attachment_info['attachment_damage_input_breaker_'.$type['type_token']] = 0;
+            }
+            //error_log('$this_attachment_info = '.print_r($this_attachment_info, true));
+
+            // Attach this auto attachment to the curent robot
+            $this_robot->set_attachment($this_attachment_token, $this_attachment_info);
+
+        }
+
         // If the damage is going to be shielded, make sure we display the skill name
         if (!empty($this_ability->ability_type)
            && !$this_robot->get_flag('skill_overlay_shown')){
@@ -87,12 +113,13 @@ $functions = array(
 
     },
     'rpg-skill_disable-skill_before' => function($objects){
+        //error_log('rpg-skill_disable-skill_before() for '.$objects['this_robot']->robot_string);
 
         // Extract all objects into the current scope
         extract($objects);
 
         // We need to remove the attachment and convert this robot to their sheilds-down image
-        $this_attachment_token = $this_robot->robot_token.'_'.$this_skill->skill_token;
+        $this_attachment_token = $this_skill->skill_token.'_input-breaker';
         $is_shielded = $this_robot->has_attachment($this_attachment_token) ? true : false;
         if ($is_shielded){
 
