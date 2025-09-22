@@ -10,7 +10,7 @@ $functions = array(
 
     },
     'rpg-robot_check-skills_battle-start' => function($objects){
-        error_log('rpg-robot_check-skills_battle-start() for '.$objects['this_robot']->robot_string.' w/ '.$objects['this_skill']->skill_token);
+        //error_log('rpg-robot_check-skills_battle-start() for '.$objects['this_robot']->robot_string.' w/ '.$objects['this_skill']->skill_token);
 
         // Extract all objects into the current scope
         extract($objects);
