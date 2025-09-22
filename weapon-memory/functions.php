@@ -66,7 +66,8 @@ $functions = array(
             $this_robot->set_base_immunities($next_core_shift_target['robot_immunities']);
 
             // Generate the event message header and body text
-            $next_master_name_span = rpg_type::print_span($next_core_shift_target['robot_core'], $next_core_shift_target['robot_name']);
+            if (!empty($next_core_shift_target['robot_flag_hidden'])){ $next_master_name_span = 'unknown origin'; }
+            else { $next_master_name_span = rpg_type::print_span($next_core_shift_target['robot_core'], $next_core_shift_target['robot_name']); }
             $this_event_header = $this_robot->robot_name.'\'s '.$this_skill->skill_name;
             $this_event_body = $this_robot->print_name_s().' triggers '.$this_robot->get_pronoun('possessive2').' '.$this_skill->print_name().'! ';
             $this_event_body .= '<br /> Memories of '.$next_master_name_span.' reconfigure '.$this_robot->get_pronoun('possessive2').' program data!';
