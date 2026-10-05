@@ -24,25 +24,24 @@ $functions = array(
         $this_player_robot = $this_player->values['robots_active'];
         if (!isset($this_robot)){ $this_robot = $this_player->get_active_robot(); }
 
-        // Collect a list of robots from this player and then loop through 'em
+        // LOOP 1: ALLY ROBOTS (Only reverse debuffs, do not disable own items)
         if (!empty($this_player_robot)){
             foreach ($this_player_robot AS $robot_key => $robot_info){
-                if ($robot_info['robot_id'] === $this_robot->robot_id){ $robot = $this_robot; }
+                if ($robot_info['robot_id'] === $this_robot->robot_id){ continue; }
                 else { $robot = rpg_game::get_robot($this_battle, $this_player, array('robot_id' => $robot_info['robot_id'])); }
                 if (empty($robot)){ unset($robot); continue; }
-                // Check to see if this robot's stat has been modified
+
+                // Check to see if this robot's stat has been penalized
                 $anti_stat_value = isset($robot->counters[$anti_stat_token.'_mods']) ? $robot->counters[$anti_stat_token.'_mods'] : 0;
-                $holding_anti_stat_booster = $robot->robot_item === $anti_stat_token.'-booster' ? true : false;
-                $anti_stat_item = $robot->has_item() && $holding_anti_stat_booster ? true : false;
-                if ($anti_stat_value > 0 || $anti_stat_value < 0 || $anti_stat_item){
+
+                // For allies, we ONLY care if they have a debuff (less than 0)
+                if ($anti_stat_value < 0){
                     $positions_of_interest[] = array(
                         'stat' => $anti_stat_token,
                         'value' => $anti_stat_value,
                         'player' => $this_player,
                         'robot' => $robot,
                         );
-                } elseif ($holding_anti_stat_booster) {
-                    $robot->set_counter('item_disabled', 3);
                 }
                 unset($robot);
             }
@@ -52,18 +51,20 @@ $functions = array(
         $target_player_robots = $target_player->values['robots_active'];
         if (!isset($target_robot)){ $target_robot = $target_player->get_active_robot(); }
 
-        // Collect a list of robots from this player and then loop through 'em
+        // LOOP 2: ENEMY ROBOTS (Only reverse buffs, and disable their items)
         if (!empty($target_player_robots)){
             foreach ($target_player_robots AS $robot_key => $robot_info){
                 if ($robot_info['robot_id'] === $target_robot->robot_id){ $robot = $target_robot; }
                 else { $robot = rpg_game::get_robot($this_battle, $target_player, array('robot_id' => $robot_info['robot_id'])); }
                 if (empty($robot)){ unset($robot); continue; }
-                // Check to see if this robot's stat has been modified
+
+                // Check to see if this robot's stat has been buffed or if they hold a booster
                 $anti_stat_value = isset($robot->counters[$anti_stat_token.'_mods']) ? $robot->counters[$anti_stat_token.'_mods'] : 0;
                 $holding_anti_stat_booster = $robot->robot_item === $anti_stat_token.'-booster' ? true : false;
-                $holding_anti_stat_booster = $robot->robot_item === $anti_stat_token.'-booster' ? true : false;
                 $anti_stat_item = $robot->has_item() && $holding_anti_stat_booster ? true : false;
-                if ($anti_stat_value > 0 || $anti_stat_value < 0 || $anti_stat_item){
+
+                // For enemies, we ONLY care if they have a buff (greater than 0) or hold a booster
+                if ($anti_stat_value > 0 || $anti_stat_item){
                     $positions_of_interest[] = array(
                         'stat' => $anti_stat_token,
                         'value' => $anti_stat_value,
@@ -142,8 +143,10 @@ $functions = array(
 
             }
 
-            // Regardless, if the target was holding a relevant booster module, disable it until end of turn
-            if ($stat_to_remove['robot']->has_item()
+            // Regardless, if the target was holding a relevant booster module AND it belongs to the enemy, disable it
+            // (We ensure it's an enemy item by checking the side, just to be completely safe)
+            if ($stat_to_remove['robot']->player->player_side !== $this_robot->player->player_side
+                && $stat_to_remove['robot']->has_item()
                 && $stat_to_remove['robot']->robot_item === $stat_to_remove['stat'].'-booster'){
 
                 // Disable the item for the rest of the turn and a few more
