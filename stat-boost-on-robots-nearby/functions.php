@@ -101,16 +101,24 @@ $functions = array(
             $player_and_robot['robot']->reset_frame();
         }
 
+        // Display the "pumped up" trigger text only once if applicable
+        $trigger_text_shown = false;
+
         // Ensure this robot's stat isn't already at max value
         foreach ($boost_stats AS $boost_stat){
             if ($this_robot->counters[$boost_stat.'_mods'] < MMRPG_SETTINGS_STATS_MOD_MAX){
-                // If this robot has a stat-based skill, display the trigger text separately
-                $trigger_text = $this_robot->print_name().' is getting pumped up!';
-                if ($this_robot->has_item() && preg_match('/^(guard|reverse|xtreme)-module$/', $this_robot->robot_item)){
-                    $this_skill->target_options_update(array('frame' => 'summon', 'success' => array(9, 0, 0, -10, $trigger_text)));
-                    $this_robot->trigger_target($this_robot, $this_skill, array('prevent_default_text' => true));
-                    $trigger_text = '';
+                
+                $trigger_text = '';
+                if (!$trigger_text_shown){
+                    $trigger_text = $this_robot->print_name().' is getting pumped up!';
+                    if ($this_robot->has_item() && preg_match('/^(guard|reverse|xtreme)-module$/', $this_robot->robot_item)){
+                        $this_skill->target_options_update(array('frame' => 'summon', 'success' => array(9, 0, 0, -10, $trigger_text)));
+                        $this_robot->trigger_target($this_robot, $this_skill, array('prevent_default_text' => true));
+                        $trigger_text = ''; // Clear it so the stat_boost function doesn't print it again
+                    }
+                    $trigger_text_shown = true;
                 }
+
                 // Call the global stat boost function with customized options
                 rpg_ability::ability_function_stat_boost($this_robot, $boost_stat, $boost_amount, $this_skill, array(
                     'success_frame' => 9,
