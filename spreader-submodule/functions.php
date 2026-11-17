@@ -15,11 +15,16 @@ $functions = array(
         // If this robot is not active, the skill doesn't activate
         if ($this_robot->robot_position !== 'active'){ return false; }
 
-        // Also save a snapshot of the field attachment tokens, if any, so we can see what's new
+        // Save a snapshot of the static field attachment tokens, if any
         $position_key = $target_robot->get_static_attachment_key();
         $start_field_attachments = $this_battle->get_attachments();
         $start_field_attachment_tokens = !empty($start_field_attachments[$position_key]) ? array_keys($start_field_attachments[$position_key]) : array();
         $this_robot->set_value('watching_field_attachment_tokens', $start_field_attachment_tokens);
+
+        // Save a snapshot of the target robot's personal attachment tokens, if any
+        $start_target_attachments = $target_robot->get_attachments();
+        $start_target_attachment_tokens = !empty($start_target_attachments) ? array_keys($start_target_attachments) : array();
+        $this_robot->set_value('watching_target_attachment_tokens', $start_target_attachment_tokens);
 
         // Return true on success
         return true;
@@ -42,24 +47,39 @@ $functions = array(
         $new_field_attachments = $this_battle->get_attachments();
         $new_field_attachment_tokens = !empty($new_field_attachments[$position_key]) ? array_keys($new_field_attachments[$position_key]) : array();
 
-        // Collect the index of negative field hazards so and then filter new attachment tokens to only relevant
+        // Collect the snapshot of the target robot's personal attachments so we can see what's new
+        $old_target_attachment_tokens = $this_robot->get_value('watching_target_attachment_tokens');
+        if (!is_array($old_target_attachment_tokens)){ $old_target_attachment_tokens = array(); }
+        $this_robot->unset_value('watching_target_attachment_tokens');
+        $new_target_attachments = $target_robot->get_attachments();
+        $new_target_attachment_tokens = !empty($new_target_attachments) ? array_keys($new_target_attachments) : array();
+
+        // Collect the index of negative field hazards so we can filter new field attachment tokens
         $negative_field_hazards = rpg_ability::get_negative_field_hazard_index();
         $negative_field_hazards_allowed = array_map(function($hazard){ return $hazard['source'].'_'.$hazard['object']; }, $negative_field_hazards);
-        //error_log('negative_field_hazards_allowed: '.print_r($negative_field_hazards_allowed, true));
 
-        // Collect the difference between the old and new attachment tokens
+        // Collect the difference between the old and new field attachment tokens
         $field_attachment_tokens_added = array_diff($new_field_attachment_tokens, $old_field_attachment_tokens);
         $field_attachments_added = array();
         if (!empty($field_attachment_tokens_added)){
             foreach ($field_attachment_tokens_added AS $token){
                 $inner_token = preg_replace('/^(ability)_([-_a-z0-9]+)_([-a-z0-9]+)$/i', '$2', $token);
-                //error_log('$inner_token: '.print_r($inner_token, true));
                 if (!in_array($inner_token, $negative_field_hazards_allowed)){ continue; }
                 $field_attachments_added[$token] = $new_field_attachments[$position_key][$token];
             }
         }
 
-        // If there aren't any new attachments added, the skill doesn't activate
+        // Collect the difference between the old and new personal target attachment tokens
+        $target_attachment_tokens_added = array_diff($new_target_attachment_tokens, $old_target_attachment_tokens);
+        $target_attachments_added = array();
+        if (!empty($target_attachment_tokens_added)){
+            foreach ($target_attachment_tokens_added AS $token){
+                // Since this is an offensive skill targeting an enemy, we assume any new ability attachment is a hazard to spread
+                $target_attachments_added[$token] = $new_target_attachments[$token];
+            }
+        }
+
+        // If there aren't any new attachments added (field or personal), the skill doesn't activate
         if (empty($target_attachment_tokens_added) && empty($field_attachment_tokens_added)){ return false; }
 
         // Collect a list of active robots from this player so we can loop through 'em
@@ -71,7 +91,7 @@ $functions = array(
         $this_battle->queue_sound_effect('scan-start');
         $this_battle->events_create($this_robot, false, $this_robot->robot_name.'\'s '.$this_skill->skill_name,
             $this_robot->print_name().'\'s '.$this_skill->print_name().' skill kicked in!<br />'.
-            ucfirst($this_robot->get_pronoun('possessive2')).' field hazard was spread to other positions!',
+            ucfirst($this_robot->get_pronoun('possessive2')).' hazards were spread to the bench!',
             array(
                 'this_skill' => $this_skill,
                 'canvas_show_this_skill_overlay' => false,
@@ -94,7 +114,7 @@ $functions = array(
                 // Define flag to see if attachments added at all
                 $attachments_added = false;
 
-                // If there were field attachments to spread, let's do it to all the other active robots
+                // If there were static field attachments to spread, apply them to the other field positions
                 $position_key = $robot->get_static_attachment_key();
                 if (!empty($field_attachments_added)){
                     foreach ($field_attachments_added AS $token => $attachment){
@@ -106,7 +126,17 @@ $functions = array(
                     }
                 }
 
-                // Show the camera looking at this robot first
+                // If there were personal robot attachments to spread, apply them to the other active robots
+                if (!empty($target_attachments_added)){
+                    foreach ($target_attachments_added AS $token => $attachment){
+                        if ($attachment['attachment_duration'] >= 99){ $attachment['attachment_duration'] = 9; }
+                        if ($robot->has_attachment($token)){ continue; }
+                        $robot->set_attachment($token, $attachment);
+                        $attachments_added = true;
+                    }
+                }
+
+                // Show the camera looking at this robot first if something was attached
                 if ($attachments_added){
                     $this_robot->set_frame('summon');
                     $robot->set_frame('defend');
